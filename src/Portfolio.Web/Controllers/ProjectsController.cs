@@ -18,21 +18,26 @@ public class ProjectsController : Controller
     }
 
     [HttpGet("/projects")]
-    public async Task<IActionResult> Index(string? q, string? category, int page = 1, CancellationToken ct = default)
+    public async Task<IActionResult> Index(string? q, string? category, string? tech, int page = 1, CancellationToken ct = default)
     {
         var settings = await _settings.GetAsync(ct);
         var model = new ProjectsIndexViewModel
         {
             Settings = settings,
-            Projects = await _query.GetProjectsAsync(q, category, page, ct),
+            Projects = await _query.GetProjectsAsync(q, category, tech, page, ct),
             Categories = await _query.GetProjectCategoriesAsync(ct),
             Query = q,
-            Category = category
+            Category = category,
+            Tech = tech
         };
+
+        var title = !string.IsNullOrWhiteSpace(tech)
+            ? $"{tech} Projects"
+            : (!string.IsNullOrWhiteSpace(category) ? $"{category} Projects" : "Projects");
 
         var description = $"Projects by {HomeController.DisplayName(await _query.GetProfileAsync(ct), settings)}";
         ViewData["Seo"] = new SeoModel(
-            category is null ? "Projects" : $"{category} projects",
+            title,
             description,
             CanonicalPath: "/projects");
         return View(model);

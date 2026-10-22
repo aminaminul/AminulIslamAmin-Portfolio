@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.EntityFrameworkCore;
 using Portfolio.Tests.Infrastructure;
 using Portfolio.Web.Models.Entities;
 
@@ -248,5 +249,120 @@ public class AdminPanelTests
         Assert.Equal(HttpStatusCode.Redirect, publish.StatusCode);
         Assert.Equal(HttpStatusCode.OK,
             (await _factory.CreateApiClient().GetAsync($"/research/{created.Slug}")).StatusCode);
+    }
+
+    [Fact]
+    public async Task AdminCanCreateAndPublishCertification()
+    {
+        var token = TestData.Token();
+        var admin = await _factory.SignInAdminAsync();
+
+        var create = await _factory.PostFormAsync(admin, "/Admin/Certifications/Create", "/Admin/Certifications/Create",
+            new Dictionary<string, string?>
+            {
+                ["Title"] = $"Cert {token}",
+                ["Issuer"] = "Test Authority",
+                ["Status"] = ((int)ContentStatus.Published).ToString()
+            });
+
+        Assert.Equal(HttpStatusCode.Redirect, create.StatusCode);
+
+        await _factory.WithDbAsync(async db =>
+        {
+            var cert = await db.Certifications.FirstOrDefaultAsync(c => c.Title == $"Cert {token}");
+            Assert.NotNull(cert);
+            Assert.Equal("Test Authority", cert!.Issuer);
+            Assert.Equal(ContentStatus.Published, cert.Status);
+        });
+    }
+
+    [Fact]
+    public async Task AdminCanCreateAndPublishExperience()
+    {
+        var token = TestData.Token();
+        var admin = await _factory.SignInAdminAsync();
+
+        var create = await _factory.PostFormAsync(admin, "/Admin/Experience/Create", "/Admin/Experience/Create",
+            new Dictionary<string, string?>
+            {
+                ["JobTitle"] = $"Software Engineer {token}",
+                ["Company"] = $"Acme Corp {token}",
+                ["StartDate"] = "2023-01-01",
+                ["Status"] = ((int)ContentStatus.Published).ToString()
+            });
+
+        Assert.Equal(HttpStatusCode.Redirect, create.StatusCode);
+
+        await _factory.WithDbAsync(async db =>
+        {
+            var exp = await db.Experiences.FirstOrDefaultAsync(e => e.JobTitle == $"Software Engineer {token}");
+            Assert.NotNull(exp);
+            Assert.Equal($"Acme Corp {token}", exp!.Company);
+            Assert.Equal(ContentStatus.Published, exp.Status);
+        });
+    }
+
+    [Fact]
+    public async Task AdminCanCreateAndPublishEducation()
+    {
+        var token = TestData.Token();
+        var admin = await _factory.SignInAdminAsync();
+
+        var create = await _factory.PostFormAsync(admin, "/Admin/Education/Create", "/Admin/Education/Create",
+            new Dictionary<string, string?>
+            {
+                ["Institution"] = $"University of Science {token}",
+                ["Qualification"] = "B.Sc. in Computer Science",
+                ["Status"] = ((int)ContentStatus.Published).ToString()
+            });
+
+        Assert.Equal(HttpStatusCode.Redirect, create.StatusCode);
+
+        await _factory.WithDbAsync(async db =>
+        {
+            var edu = await db.Educations.FirstOrDefaultAsync(e => e.Institution == $"University of Science {token}");
+            Assert.NotNull(edu);
+            Assert.Equal("B.Sc. in Computer Science", edu!.Qualification);
+            Assert.Equal(ContentStatus.Published, edu.Status);
+        });
+    }
+
+    [Fact]
+    public async Task AdminCanCreateSkillCategoryAndSkill()
+    {
+        var token = TestData.Token();
+        var admin = await _factory.SignInAdminAsync();
+
+        var catCreate = await _factory.PostFormAsync(admin, "/Admin/Skills/CategoryCreate", "/Admin/Skills/Categories",
+            new Dictionary<string, string?>
+            {
+                ["Name"] = $"Category {token}",
+                ["IsVisible"] = "true"
+            });
+
+        Assert.Equal(HttpStatusCode.Redirect, catCreate.StatusCode);
+
+        SkillCategory? category = null;
+        await _factory.WithDbAsync(async db =>
+        {
+            category = await db.SkillCategories.FirstOrDefaultAsync(c => c.Name == $"Category {token}");
+        });
+        Assert.NotNull(category);
+
+        var skillCreate = await _factory.PostFormAsync(admin, "/Admin/Skills/Create", "/Admin/Skills/Create",
+            new Dictionary<string, string?>
+            {
+                ["Name"] = $"Skill {token}",
+                ["CategoryId"] = category!.Id.ToString()
+            });
+
+        Assert.Equal(HttpStatusCode.Redirect, skillCreate.StatusCode);
+
+        await _factory.WithDbAsync(async db =>
+        {
+            var skill = await db.Skills.FirstOrDefaultAsync(s => s.Name == $"Skill {token}");
+            Assert.NotNull(skill);
+            Assert.Equal(category.Id, skill!.CategoryId);
+        });
     }
 }

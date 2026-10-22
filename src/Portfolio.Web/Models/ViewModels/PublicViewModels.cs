@@ -54,6 +54,7 @@ public class ProjectsIndexViewModel
     public IReadOnlyList<string> Categories { get; init; } = [];
     public string? Query { get; init; }
     public string? Category { get; init; }
+    public string? Tech { get; init; }
 }
 
 public class ProjectDetailViewModel
@@ -80,6 +81,62 @@ public class ResearchDetailViewModel
     public SiteSettings Settings { get; init; } = new();
     public Research Research { get; init; } = new();
     public IReadOnlyList<Research> Related { get; init; } = [];
+
+    public string GenerateBibTeX()
+    {
+        var year = Research.PublicationDate?.Year ?? (Research.StartDate?.Year ?? DateTime.UtcNow.Year);
+        var primaryAuthor = Research.Authors.OrderBy(a => a.DisplayOrder).FirstOrDefault()?.Name ?? "Author";
+        var firstWordOfLastName = primaryAuthor.Split(' ', StringSplitOptions.RemoveEmptyEntries).LastOrDefault()?.ToLowerInvariant() ?? "author";
+        var citationKey = $"{firstWordOfLastName}{year}_{Research.Slug.Replace('-', '_')}";
+        var authorList = Research.Authors.Count > 0
+            ? string.Join(" and ", Research.Authors.OrderBy(a => a.DisplayOrder).Select(a => a.Name))
+            : primaryAuthor;
+        var venue = !string.IsNullOrWhiteSpace(Research.Journal)
+            ? Research.Journal
+            : (!string.IsNullOrWhiteSpace(Research.PublicationVenue) ? Research.PublicationVenue : "Working Paper");
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"@article{{{citationKey},");
+        sb.AppendLine($"  title = {{{Research.Title}}},");
+        sb.AppendLine($"  author = {{{authorList}}},");
+        sb.AppendLine($"  journal = {{{venue}}},");
+        sb.Append($"  year = {{{year}}}");
+        if (!string.IsNullOrWhiteSpace(Research.Doi))
+        {
+            sb.AppendLine(",");
+            sb.Append($"  doi = {{{Research.Doi}}}");
+        }
+        else if (!string.IsNullOrWhiteSpace(Research.ExternalUrl))
+        {
+            sb.AppendLine(",");
+            sb.Append($"  url = {{{Research.ExternalUrl}}}");
+        }
+        sb.AppendLine();
+        sb.Append('}');
+        return sb.ToString();
+    }
+
+    public string GenerateApa()
+    {
+        var year = Research.PublicationDate?.Year ?? (Research.StartDate?.Year ?? DateTime.UtcNow.Year);
+        var authors = Research.Authors.OrderBy(a => a.DisplayOrder).Select(a => a.Name).ToList();
+        string authorStr;
+        if (authors.Count == 0) authorStr = "Author";
+        else if (authors.Count == 1) authorStr = authors[0];
+        else if (authors.Count == 2) authorStr = $"{authors[0]} & {authors[1]}";
+        else authorStr = $"{authors[0]} et al.";
+
+        var venue = !string.IsNullOrWhiteSpace(Research.Journal)
+            ? Research.Journal
+            : (!string.IsNullOrWhiteSpace(Research.PublicationVenue) ? Research.PublicationVenue : null);
+
+        var venuePart = venue is not null ? $" {venue}." : "";
+        var doiPart = !string.IsNullOrWhiteSpace(Research.Doi)
+            ? $" https://doi.org/{Research.Doi.Replace("https://doi.org/", "")}"
+            : (!string.IsNullOrWhiteSpace(Research.ExternalUrl) ? $" {Research.ExternalUrl}" : "");
+
+        return $"{authorStr} ({year}). {Research.Title}.{venuePart}{doiPart}".Trim();
+    }
 }
 
 public class ServicesViewModel

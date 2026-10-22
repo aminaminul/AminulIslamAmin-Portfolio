@@ -173,4 +173,48 @@ public class PublicWebsiteTests
         Assert.Contains(publishedTestimonial.Quote, html);
         Assert.DoesNotContain(draftTestimonial.Quote, html);
     }
+
+    [Fact]
+    public async Task HealthCheck_ReturnsHealthyOk()
+    {
+        var response = await _factory.CreateApiClient().GetAsync("/healthz");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var text = await response.Content.ReadAsStringAsync();
+        Assert.Equal("Healthy", text);
+    }
+
+    [Fact]
+    public async Task ProjectsPage_FiltersByTechnology()
+    {
+        var techSlug = "tech-" + TestData.Token();
+        var p1 = await TestData.AddProjectAsync(_factory, ContentStatus.Published);
+        var p2 = await TestData.AddProjectAsync(_factory, ContentStatus.Published);
+
+        await _factory.WithDbAsync(async db =>
+        {
+            var tech = new Technology { Name = "Tech " + TestData.Token(), Slug = techSlug };
+            db.Technologies.Add(tech);
+            await db.SaveChangesAsync();
+
+            db.ProjectTechnologies.Add(new ProjectTechnology { ProjectId = p1.Id, TechnologyId = tech.Id });
+            await db.SaveChangesAsync();
+        });
+
+        var client = _factory.CreateBrowserClient();
+        var html = await client.GetStringAsync($"/projects?tech={techSlug}");
+
+        Assert.Contains(p1.Title, html);
+        Assert.DoesNotContain(p2.Title, html);
+    }
+
+    [Fact]
+    public async Task ResearchDetails_RendersCitationModalAndButtons()
+    {
+        var research = await TestData.AddResearchAsync(_factory, ContentStatus.Published);
+        var client = _factory.CreateBrowserClient();
+        var html = await client.GetStringAsync($"/research/{research.Slug}");
+
+        Assert.Contains("citation-modal", html);
+        Assert.Contains("@article{", html);
+    }
 }

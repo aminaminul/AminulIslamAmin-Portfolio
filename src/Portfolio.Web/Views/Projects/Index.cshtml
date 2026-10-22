@@ -24,22 +24,36 @@
                 {
                     <input type="hidden" name="category" value="@Model.Category" />
                 }
+                @if (!string.IsNullOrWhiteSpace(Model.Tech))
+                {
+                    <input type="hidden" name="tech" value="@Model.Tech" />
+                }
                 <button class="btn btn-secondary btn-sm" type="submit">@L["Search"]</button>
-                @if (!string.IsNullOrWhiteSpace(Model.Query) || !string.IsNullOrWhiteSpace(Model.Category))
+                @if (!string.IsNullOrWhiteSpace(Model.Query) || !string.IsNullOrWhiteSpace(Model.Category) || !string.IsNullOrWhiteSpace(Model.Tech))
                 {
                     <a class="btn btn-ghost btn-sm" href="/projects">@L["Clear filters"]</a>
                 }
             </form>
 
+            @if (!string.IsNullOrWhiteSpace(Model.Tech))
+            {
+                <div class="active-filter-row">
+                    <span class="active-filter-tag">
+                        <span>@L["Technology:"] <strong>@Model.Tech</strong></span>
+                        <a href="@Url.Action("Index", "Projects", new { q = Model.Query, category = Model.Category })" title="@L["Remove filter"]" aria-label="@L["Remove filter"]">×</a>
+                    </span>
+                </div>
+            }
+
             @if (Model.Categories.Count > 0)
             {
                 <nav class="filter-chips" aria-label="@L["Filter by category"]">
                     <a class="chip @(string.IsNullOrWhiteSpace(Model.Category) ? "is-active" : null)"
-                       href="@Url.Action("Index", "Projects", new { q = Model.Query })">@L["All"]</a>
+                       href="@Url.Action("Index", "Projects", new { q = Model.Query, tech = Model.Tech })">@L["All"]</a>
                     @foreach (var category in Model.Categories)
                     {
                         <a class="chip @(Model.Category == category ? "is-active" : null)"
-                           href="@Url.Action("Index", "Projects", new { q = Model.Query, category })">@category</a>
+                           href="@Url.Action("Index", "Projects", new { q = Model.Query, category, tech = Model.Tech })">@category</a>
                     }
                 </nav>
             }
@@ -47,7 +61,7 @@
 
         @if (Model.Projects.Items.Count == 0)
         {
-            @if (!string.IsNullOrWhiteSpace(Model.Query) || !string.IsNullOrWhiteSpace(Model.Category))
+            @if (!string.IsNullOrWhiteSpace(Model.Query) || !string.IsNullOrWhiteSpace(Model.Category) || !string.IsNullOrWhiteSpace(Model.Tech))
             {
                 <partial name="_Empty" model="@(new EmptyStateModel(L["No matching projects"].Value, L["Try a different search term or clear the filters."].Value, "search", "/projects", L["Clear filters"].Value))" />
             }
@@ -66,7 +80,7 @@
                 }
             </div>
             <partial name="_Pager" model="@(new PagerModel(Model.Projects.Page, Model.Projects.TotalPages,
-                page => Url.Action("Index", "Projects", new { q = Model.Query, category = Model.Category, page })!))" />
+                page => Url.Action("Index", "Projects", new { q = Model.Query, category = Model.Category, tech = Model.Tech, page })!))" />
         }
     </div>
 </section>

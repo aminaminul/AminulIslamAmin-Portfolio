@@ -122,7 +122,7 @@ public interface IPortfolioQueryService
     Task<IReadOnlyList<AboutSection>> GetAboutSectionsAsync(CancellationToken ct = default);
     Task<IReadOnlyList<SkillCategory>> GetSkillsAsync(CancellationToken ct = default);
     Task<IReadOnlyList<Project>> GetPublishedProjectsAsync(CancellationToken ct = default);
-    Task<PagedList<Project>> GetProjectsAsync(string? q, string? category, int page, CancellationToken ct = default);
+    Task<PagedList<Project>> GetProjectsAsync(string? q, string? category, string? tech = null, int page = 1, CancellationToken ct = default);
     Task<IReadOnlyList<string>> GetProjectCategoriesAsync(CancellationToken ct = default);
     Task<Project?> GetPublishedProjectAsync(string slug, CancellationToken ct = default);
     Task<IReadOnlyList<Project>> GetRelatedProjectsAsync(Project project, int take, CancellationToken ct = default);
@@ -190,7 +190,7 @@ public class PortfolioQueryService : IPortfolioQueryService
             .Take(6)
             .ToListAsync(ct);
 
-    public async Task<PagedList<Project>> GetProjectsAsync(string? q, string? category, int page, CancellationToken ct = default)
+    public async Task<PagedList<Project>> GetProjectsAsync(string? q, string? category, string? tech = null, int page = 1, CancellationToken ct = default)
     {
         var query = _db.Projects.AsNoTracking()
             .Where(p => p.Status == ContentStatus.Published);
@@ -206,6 +206,12 @@ public class PortfolioQueryService : IPortfolioQueryService
 
         if (!string.IsNullOrWhiteSpace(category))
             query = query.Where(p => p.Category == category);
+
+        if (!string.IsNullOrWhiteSpace(tech))
+        {
+            var techTerm = tech.Trim();
+            query = query.Where(p => p.Technologies.Any(t => t.Technology!.Slug == techTerm || t.Technology!.Name == techTerm));
+        }
 
         query = query
             .OrderByDescending(p => p.IsFeatured)

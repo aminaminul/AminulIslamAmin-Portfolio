@@ -52,7 +52,9 @@
             <ul class="chip-row" aria-label="@L["Technologies"]">
                 @foreach (var tech in Model.Technologies.Take(4))
                 {
-                    <li class="chip">@tech.Technology?.Name</li>
+                    <li class="chip">
+                        <a class="chip-link" href="/projects?tech=@tech.Technology?.Slug">@tech.Technology?.Name</a>
+                    </li>
                 }
                 @if (Model.Technologies.Count > 4)
                 {

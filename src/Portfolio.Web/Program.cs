@@ -53,7 +53,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.Name = "Portfolio.AdminAuth";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing")
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
     options.LoginPath = "/Admin/Account/Login";
     options.LogoutPath = "/Admin/Account/Logout";
     options.AccessDeniedPath = "/Admin/Account/AccessDenied";
@@ -157,6 +159,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
                                | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
+    // Restrict trusted proxies to loopback interfaces by default so external clients cannot spoof X-Forwarded-For
+    options.KnownProxies.Add(System.Net.IPAddress.Loopback);
+    options.KnownProxies.Add(System.Net.IPAddress.IPv6Loopback);
 });
 
 builder.Services.AddAntiforgery(options =>
@@ -164,8 +169,14 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.Name = "Portfolio.Antiforgery";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Strict;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing")
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
 });
+
+// ---------- Health checks ----------
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database");
 
 var app = builder.Build();
 
@@ -211,6 +222,8 @@ app.UseRouting();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHealthChecks("/healthz");
 
 // The area route is registered with a negative order so that link generation inside the admin
 // area resolves to /Admin/... endpoints. Public controllers declare absolute attribute routes

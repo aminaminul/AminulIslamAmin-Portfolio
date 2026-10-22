@@ -149,7 +149,9 @@
                         <ul class="chip-row">
                             @foreach (var tech in project.Technologies)
                             {
-                                <li class="chip">@tech.Technology?.Name</li>
+                                <li class="chip">
+                                    <a class="chip-link" href="/projects?tech=@tech.Technology?.Slug">@tech.Technology?.Name</a>
+                                </li>
                             }
                         </ul>
                     </div>

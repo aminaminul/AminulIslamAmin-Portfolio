@@ -199,7 +199,14 @@
                 @foreach (var cert in Model.Certifications)
                 {
                     <article class="cert-card" data-reveal>
-                        <span class="icon-badge" aria-hidden="true"><partial name="_Icon" model="@("award")" /></span>
+                        @if (cert.ImageMediaId is not null)
+                        {
+                            <span class="icon-badge icon-badge-image" aria-hidden="true"><img src="/media/@cert.ImageMediaId" alt="" loading="lazy" /></span>
+                        }
+                        else
+                        {
+                            <span class="icon-badge" aria-hidden="true"><partial name="_Icon" model="@("award")" /></span>
+                        }
                         <h3>@cert.Title.Pick(cert.TitleBn)</h3>
                         <p class="muted">@cert.Issuer</p>
                         <p class="cert-meta">
@@ -249,6 +256,10 @@
                 @foreach (var item in Model.Achievements)
                 {
                     <article class="achievement-item" data-reveal>
+                        @if (item.ImageMediaId is not null)
+                        {
+                            <span class="icon-badge icon-badge-image" aria-hidden="true"><img src="/media/@item.ImageMediaId" alt="" loading="lazy" /></span>
+                        }
                         <span class="achievement-date">@item.AchievementDate.FormatDate()</span>
                         <div>
                             <h3>@item.Title.Pick(item.TitleBn)</h3>
