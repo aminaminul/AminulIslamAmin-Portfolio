@@ -1,0 +1,91 @@
+@model TestimonialFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit testimonial" : "New testimonial";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Publish only with permission from the client. Do not invent reviews.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Testimonials"><partial name="_Icon" model="@("arrow-left")" /> Back</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Testimonials" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="ClientName">Client name <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="ClientName" required maxlength="160" />
+                <span class="field-error" asp-validation-for="ClientName"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ClientRole">Role</label>
+                <input asp-for="ClientRole" maxlength="160" placeholder="Engineering Manager" />
+                <span class="field-error" asp-validation-for="ClientRole"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Organization">Organisation</label>
+                <input asp-for="Organization" maxlength="200" />
+                <span class="field-error" asp-validation-for="Organization"></span>
+            </div>
+            <div class="field">
+                <label asp-for="TestimonialDate">Date</label>
+                <input asp-for="TestimonialDate" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div class="field span-2">
+                <label asp-for="Quote">Testimonial (English) <span class="required" aria-hidden="true">*</span></label>
+                <textarea asp-for="Quote" required rows="5" maxlength="2000"></textarea>
+                <span class="field-error" asp-validation-for="Quote"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="QuoteBn">Testimonial (Bangla)</label>
+                <textarea asp-for="QuoteBn" rows="4" maxlength="2400" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="QuoteBn"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="SourceUrl">Source URL</label>
+                <input asp-for="SourceUrl" type="url" maxlength="600" placeholder="Link to the original recommendation" />
+                <span class="field-error" asp-validation-for="SourceUrl"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Avatar</h2>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("Avatar", "Client avatar", Model.AvatarMediaId,
+                ViewData["AvatarChoices"] as IEnumerable<MediaFile> ?? [], "Optional. Only upload a photo you have permission to use."))" />
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Moderation</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Status">Status</label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<ContentStatus>()"></select>
+                <span class="hint">Draft keeps the testimonial off the public site until approved.</span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/Testimonials">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save changes" : "Create testimonial")</span>
+        </button>
+    </div>
+</form>

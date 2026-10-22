@@ -1,0 +1,102 @@
+@model SkillFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit skill" : "New skill";
+    ViewData["Section"] = "Portfolio";
+    var categories = ViewData["CategoryOptions"] as IReadOnlyList<SkillCategory> ?? [];
+    var icons = IconCatalog.Names;
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>A skill can be grouped, ordered and optionally show a proficiency level.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Skills"><partial name="_Icon" model="@("arrow-left")" /> Back to list</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Skills" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Skill details</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Name">Name (English) <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Name" required maxlength="100" />
+                <span class="field-error" asp-validation-for="Name"></span>
+            </div>
+            <div class="field">
+                <label asp-for="NameBn">Name (Bangla)</label>
+                <input asp-for="NameBn" maxlength="120" lang="bn" />
+                <span class="field-error" asp-validation-for="NameBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="CategoryId">Category</label>
+                <select asp-for="CategoryId">
+                    <option value="">Uncategorised</option>
+                    @foreach (var category in categories)
+                    {
+                        <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">@category.Name</option>
+                    }
+                </select>
+                <span class="field-error" asp-validation-for="CategoryId"></span>
+            </div>
+            <div class="field">
+                <label asp-for="IconName">Icon</label>
+                <select asp-for="IconName">
+                    <option value="">Default</option>
+                    @foreach (var icon in icons)
+                    {
+                        <option value="@icon" selected="@(Model.IconName == icon)">@icon</option>
+                    }
+                </select>
+                <span class="field-error" asp-validation-for="IconName"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Description">Description (English)</label>
+                <textarea asp-for="Description" rows="3" maxlength="500"></textarea>
+                <span class="field-error" asp-validation-for="Description"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="DescriptionBn">Description (Bangla)</label>
+                <textarea asp-for="DescriptionBn" rows="3" maxlength="600" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="DescriptionBn"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Presentation</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Proficiency">Proficiency (0–100)</label>
+                <input asp-for="Proficiency" type="number" min="0" max="100" />
+                <span class="hint">Leave empty to hide the proficiency bar. Only set a value you can stand behind.</span>
+                <span class="field-error" asp-validation-for="Proficiency"></span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+                <span class="field-error" asp-validation-for="DisplayOrder"></span>
+            </div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="IsVisible" />
+                <label for="IsVisible">Visible on the public website</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/Skills">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save changes" : "Create skill")</span>
+        </button>
+    </div>
+</form>

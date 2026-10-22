@@ -1,0 +1,155 @@
+@model ContactPageViewModel
+@inject Microsoft.Extensions.Options.IOptions<Portfolio.Web.Models.Options.EmailOptions> EmailOptions
+@{
+    var settings = Model.Settings;
+    var name = Model.Profile.DisplayName(settings);
+    var success = TempData["ContactSuccess"] as string;
+    var warning = TempData["ContactWarning"] as bool? == true;
+    var emailConfigured = EmailOptions.Value.IsConfigured;
+}
+<section class="page-hero page-hero-sm">
+    <div class="container">
+        <p class="section-eyebrow">@L["Contact"]</p>
+        <h1 class="page-title">@L["Get in touch"]</h1>
+        <p class="page-lead">@(settings.ContactIntro.PickOptional(settings.ContactIntroBn) ?? string.Format(L["Have a question or a project in mind? Send a message to {0}."], name))</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container contact-layout">
+        <aside class="contact-info">
+            <h2>@L["Contact details"]</h2>
+            @if (settings.IsAvailable && !string.IsNullOrWhiteSpace(settings.AvailabilityText))
+            {
+                <p class="availability"><span class="dot" aria-hidden="true"></span>@settings.AvailabilityText.Pick(settings.AvailabilityTextBn)</p>
+            }
+            <ul class="contact-list">
+                @if (!string.IsNullOrWhiteSpace(settings.ContactEmail))
+                {
+                    <li>
+                        <span class="contact-icon" aria-hidden="true"><partial name="_Icon" model="@("mail")" /></span>
+                        <span><span class="meta-label">@L["Email"]</span><a href="mailto:@settings.ContactEmail">@settings.ContactEmail</a></span>
+                    </li>
+                }
+                @if (!string.IsNullOrWhiteSpace(settings.ContactPhone))
+                {
+                    <li>
+                        <span class="contact-icon" aria-hidden="true"><partial name="_Icon" model="@("phone")" /></span>
+                        <span><span class="meta-label">@L["Phone"]</span><a href="tel:@settings.ContactPhone">@settings.ContactPhone</a></span>
+                    </li>
+                }
+                @if (!string.IsNullOrWhiteSpace(settings.ContactLocation))
+                {
+                    <li>
+                        <span class="contact-icon" aria-hidden="true"><partial name="_Icon" model="@("map-pin")" /></span>
+                        <span><span class="meta-label">@L["Location"]</span>@settings.ContactLocation</span>
+                    </li>
+                }
+            </ul>
+            @if (Model.SocialLinks.Count > 0)
+            {
+                <div class="contact-socials">
+                    <h3>@L["Profiles"]</h3>
+                    <ul class="social-row">
+                        @foreach (var link in Model.SocialLinks)
+                        {
+                            <li>
+                                <a class="icon-link" href="@link.Url" target="_blank" rel="noopener noreferrer me" aria-label="@link.Platform">
+                                    <partial name="_Icon" model="@(link.IconName ?? "globe")" />
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            <p class="contact-note">@L["Your details are only used to reply to your message."]</p>
+        </aside>
+
+        <div class="contact-form-panel">
+            @if (!string.IsNullOrWhiteSpace(success) && !warning)
+            {
+                <div class="alert alert-success" role="status">
+                    <partial name="_Icon" model="@("check")" />
+                    <p>@success</p>
+                </div>
+            }
+            else if (!string.IsNullOrWhiteSpace(success) && warning)
+            {
+                <div class="alert alert-warning" role="status">
+                    <partial name="_Icon" model="@("info")" />
+                    <p>@success</p>
+                </div>
+            }
+
+            @if (!Model.FormAvailable)
+            {
+                <div class="closed-panel">
+                    <span class="icon-badge" aria-hidden="true"><partial name="_Icon" model="@("mail")" /></span>
+                    <h2>@L["The contact form is currently closed"]</h2>
+                    <p>@L["You can still reach out by email."]</p>
+                    @if (!string.IsNullOrWhiteSpace(settings.ContactEmail))
+                    {
+                        <a class="btn btn-primary" href="mailto:@settings.ContactEmail">@settings.ContactEmail</a>
+                    }
+                </div>
+            }
+            else
+            {
+                <form class="contact-form" method="post" asp-controller="Contact" asp-action="Index" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert"></div>
+
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="Name">@L["Your name"] <span class="required" aria-hidden="true">*</span></label>
+                            <input id="Name" name="Name" value="@Model.Form.Name" autocomplete="name" required maxlength="160"
+                                   aria-describedby="Name-error" />
+                            <span class="field-error" id="Name-error" asp-validation-for="Form.Name"></span>
+                        </div>
+                        <div class="field">
+                            <label for="Email">@L["Email address"] <span class="required" aria-hidden="true">*</span></label>
+                            <input id="Email" name="Email" type="email" value="@Model.Form.Email" autocomplete="email" required maxlength="200"
+                                   aria-describedby="Email-error" />
+                            <span class="field-error" id="Email-error" asp-validation-for="Form.Email"></span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="Subject">@L["Subject"]</label>
+                        <input id="Subject" name="Subject" value="@Model.Form.Subject" maxlength="200" />
+                        <span class="field-error" asp-validation-for="Form.Subject"></span>
+                    </div>
+
+                    <div class="field">
+                        <label for="Message">@L["Message"] <span class="required" aria-hidden="true">*</span></label>
+                        <textarea id="Message" name="Message" rows="7" required maxlength="4000"
+                                  placeholder="@L["Tell me about your project, role or question."]">@Model.Form.Message</textarea>
+                        <span class="field-error" asp-validation-for="Form.Message"></span>
+                    </div>
+
+                    <div class="hp-field" aria-hidden="true">
+                        <label for="Website">Website</label>
+                        <input id="Website" name="Website" tabindex="-1" autocomplete="off" />
+                    </div>
+
+                    <div class="checkbox-field">
+                        <input id="Consent" name="Consent" type="checkbox" value="true" checked="@Model.Form.Consent" />
+                        <label for="Consent">@L["I agree to be contacted about this message."]</label>
+                    </div>
+                    <span class="field-error" asp-validation-for="Form.Consent"></span>
+
+                    <div class="form-footer">
+                        <button class="btn btn-primary" type="submit" data-submit-once>
+                            <span class="btn-label">@L["Send message"]</span>
+                            <partial name="_Icon" model="@("send")" />
+                        </button>
+                        @if (!emailConfigured)
+                        {
+                            <p class="hint">@L["Email delivery is not configured, so your message is saved to the site inbox instead."]</p>
+                        }
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</section>

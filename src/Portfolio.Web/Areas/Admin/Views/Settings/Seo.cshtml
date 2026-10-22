@@ -1,0 +1,72 @@
+@model SeoSettingsFormModel
+@{
+    ViewData["Title"] = "SEO settings";
+    ViewData["Section"] = "Site";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>SEO settings</h1>
+        <p>Defaults used when a page or record has no specific metadata. Titles and descriptions are generated from content where possible.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/sitemap.xml" target="_blank" rel="noopener">View sitemap</a>
+        <a class="btn btn-ghost btn-sm" href="/robots.txt" target="_blank" rel="noopener">robots.txt</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Settings" asp-action="Seo" enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Search engine defaults</h2>
+        <div class="form-grid">
+            <div class="field span-2">
+                <label asp-for="SeoTitle">Default title</label>
+                <input asp-for="SeoTitle" maxlength="200" />
+                <span class="hint">Used on the home page. Project and research pages use their own metadata when provided.</span>
+                <span class="field-error" asp-validation-for="SeoTitle"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="SeoDescription">Default description</label>
+                <textarea asp-for="SeoDescription" rows="3" maxlength="400"></textarea>
+                <span class="field-error" asp-validation-for="SeoDescription"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="SeoKeywords">Keywords</label>
+                <input asp-for="SeoKeywords" maxlength="400" />
+                <span class="hint">Comma-separated. Search engines treat these as a weak signal; use specific terms.</span>
+                <span class="field-error" asp-validation-for="SeoKeywords"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Social sharing image</h2>
+        <p class="section-hint">Used for Open Graph and Twitter cards as a fallback. 1200×630 works best.</p>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("OgImage", "Social image", Model.OgImageMediaId,
+                ViewData["OgImageChoices"] as IEnumerable<MediaFile> ?? [], null))" />
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>robots.txt</h2>
+        <p class="section-hint">Admin pages and unpublished content are excluded automatically. Add extra directives below if needed.</p>
+        <div class="field">
+            <label asp-for="RobotsTxtExtra">Additional robots.txt lines</label>
+            <textarea asp-for="RobotsTxtExtra" rows="4" maxlength="1000" placeholder="Disallow: /private"></textarea>
+            <span class="field-error" asp-validation-for="RobotsTxtExtra"></span>
+        </div>
+        <div class="form-note" style="margin-top:1rem">
+            The sitemap includes only public, published content. Drafts, archived records and admin routes are never listed.
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">Save SEO settings</span>
+        </button>
+    </div>
+</form>

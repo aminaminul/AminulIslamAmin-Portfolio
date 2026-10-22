@@ -1,0 +1,64 @@
+@model SocialLinkFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit social link" : "New social link";
+    ViewData["Section"] = "Site";
+    var icons = ViewData["Icons"] as string[] ?? IconCatalog.SocialNames;
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Only full https links are accepted. Invalid links are rejected by server-side validation.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/SocialLinks"><partial name="_Icon" model="@("arrow-left")" /> Back</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="SocialLinks" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Platform">Platform <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Platform" required maxlength="80" placeholder="GitHub" />
+                <span class="field-error" asp-validation-for="Platform"></span>
+            </div>
+            <div class="field">
+                <label asp-for="IconName">Icon</label>
+                <select asp-for="IconName">
+                    <option value="">Default</option>
+                    @foreach (var icon in icons)
+                    {
+                        <option value="@icon" selected="@(Model.IconName == icon)">@icon</option>
+                    }
+                </select>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Url">Profile URL <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Url" type="url" required maxlength="600" placeholder="https://github.com/username" />
+                <span class="field-error" asp-validation-for="Url"></span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+            </div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card"><input asp-for="IsVisible" /><label for="IsVisible">Visible</label></div>
+            <div class="check-card"><input asp-for="ShowInHero" /><label for="ShowInHero">Show in hero</label></div>
+            <div class="check-card"><input asp-for="ShowInFooter" /><label for="ShowInFooter">Show in footer</label></div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/SocialLinks">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save changes" : "Add link")</span>
+        </button>
+    </div>
+</form>

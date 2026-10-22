@@ -1,0 +1,142 @@
+@model AdminListViewModel<Research>
+@{
+    ViewData["Title"] = "Research & publications";
+    ViewData["Section"] = "Portfolio";
+    var categories = ViewData["ResearchCategories"] as IReadOnlyList<ResearchCategory> ?? [];
+    var statuses = new[] { ("", "All"), ("published", "Published"), ("draft", "Drafts"), ("archived", "Archived") };
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Research &amp; publications</h1>
+        <p>Structured research records with drafts, publication controls, authors, documents and relationships.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Research/Categories"><partial name="_Icon" model="@("layers")" /> Categories</a>
+        <a class="btn btn-primary btn-sm" href="/Admin/Research/Create"><partial name="_Icon" model="@("plus")" /> New record</a>
+    </div>
+</div>
+
+<div class="admin-toolbar">
+    <div class="filter-tabs" role="group" aria-label="Filter by status">
+        @foreach (var (value, label) in statuses)
+        {
+            <a class="filter-tab @(Model.Status == (string.IsNullOrEmpty(value) ? null : value) ? "is-active" : null)"
+               href="@Url.Action("Index", "Research", new { q = Model.Q, category = Model.Filter, status = string.IsNullOrEmpty(value) ? null : value })">@label</a>
+        }
+    </div>
+    <form class="admin-filters" method="get" action="/Admin/Research" role="search">
+        <label class="sr-only" for="research-q">Search research</label>
+        <input id="research-q" type="search" name="q" value="@Model.Q" placeholder="Search title or slug" />
+        <label class="sr-only" for="research-category">Category</label>
+        <select id="research-category" name="category">
+            <option value="">All categories</option>
+            @foreach (var category in categories)
+            {
+                <option value="@category.Slug" selected="@(Model.Filter == category.Slug)">@category.Name</option>
+            }
+        </select>
+        <input type="hidden" name="status" value="@Model.Status" />
+        <button class="btn btn-secondary" type="submit">Filter</button>
+        @if (Model.HasFilters)
+        {
+            <a class="btn btn-ghost" href="/Admin/Research">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="admin-card">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No research found", "Add a research record or adjust the filters.", "file-text", "/Admin/Research/Create", "New research"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:80px">Order</th>
+                        <th>Title</th>
+                        <th style="width:150px">Category</th>
+                        <th style="width:100px">Year</th>
+                        <th style="width:110px">Status</th>
+                        <th style="width:300px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var record in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="Move" asp-route-id="@record.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up"><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Move" asp-route-id="@record.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down"><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@record.Title</strong>
+                                    <span>/research/@record.Slug · @record.Authors.Count author(s)</span>
+                                </div>
+                                @if (record.IsFeatured)
+                                {
+                                    <span class="badge badge-featured" style="margin-top:0.3rem">Featured</span>
+                                }
+                            </td>
+                            <td class="cell-muted">@(record.Category?.Name ?? "—")</td>
+                            <td class="cell-muted">@(record.PublicationDate?.Year.ToString() ?? "—")</td>
+                            <td><partial name="_StatusBadge" model="record.Status" /></td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/Research/Preview/@record.Id" target="_blank" aria-label="Preview"><partial name="_Icon" model="@("eye")" /></a>
+                                    <a class="icon-action" href="/Admin/Research/Edit/@record.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    <form method="post" asp-action="ToggleFeatured" asp-route-id="@record.Id">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="@(record.IsFeatured ? "Remove featured" : "Feature")"><partial name="_Icon" model="@("star")" /></button>
+                                    </form>
+                                    @if (record.Status == ContentStatus.Published)
+                                    {
+                                        <form method="post" asp-action="Unpublish" asp-route-id="@record.Id" data-confirm="Unpublish this research record? It will be removed from the public site and sitemap.">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Unpublish"><partial name="_Icon" model="@("eye")" /></button>
+                                        </form>
+                                        <form method="post" asp-action="Archive" asp-route-id="@record.Id" data-confirm="Archive this research record?">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Archive"><partial name="_Icon" model="@("folder")" /></button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-action="Publish" asp-route-id="@record.Id">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Publish"><partial name="_Icon" model="@("check")" /></button>
+                                        </form>
+                                    }
+                                    <form method="post" asp-action="Delete" asp-route-id="@record.Id"
+                                          data-confirm="Delete this research record permanently? Associated authors, tags and relations are removed.">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Pager is not null)
+        {
+            <div class="admin-card-footer">
+                <partial name="_Pager" model="Model.Pager" />
+            </div>
+        }
+    }
+</div>

@@ -1,0 +1,49 @@
+@model FooterSettingsFormModel
+@{
+    ViewData["Title"] = "Footer";
+    ViewData["Section"] = "Site";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Footer</h1>
+        <p>Footer description and copyright. Navigation links and social profiles are managed in their own modules.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Navigation">Manage footer links</a>
+        <a class="btn btn-ghost btn-sm" href="/Admin/SocialLinks">Social links</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Settings" asp-action="Footer" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Footer content</h2>
+        <div class="form-grid">
+            <div class="field span-2">
+                <label asp-for="FooterDescription">Footer description (English)</label>
+                <textarea asp-for="FooterDescription" rows="3" maxlength="600"></textarea>
+                <span class="field-error" asp-validation-for="FooterDescription"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="FooterDescriptionBn">Footer description (Bangla)</label>
+                <textarea asp-for="FooterDescriptionBn" rows="3" maxlength="600" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="FooterDescriptionBn"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="CopyrightText">Copyright text</label>
+                <input asp-for="CopyrightText" maxlength="200" />
+                <span class="hint">Leave empty to generate "© current-year name. All rights reserved." dynamically.</span>
+                <span class="field-error" asp-validation-for="CopyrightText"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">Save footer</span>
+        </button>
+    </div>
+</form>

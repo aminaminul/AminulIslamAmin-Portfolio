@@ -1,0 +1,98 @@
+@model AdminListViewModel<Service>
+@{
+    ViewData["Title"] = "Services";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Services</h1>
+        <p>Service cards shown on the home and services pages. Prices appear only when you set one.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-primary btn-sm" href="/Admin/Services/Create"><partial name="_Icon" model="@("plus")" /> New service</a>
+    </div>
+</div>
+
+<div class="admin-toolbar">
+    <form class="admin-filters" method="get" action="/Admin/Services" role="search">
+        <label class="sr-only" for="service-q">Search services</label>
+        <input id="service-q" type="search" name="q" value="@Model.Q" placeholder="Search services" />
+        <button class="btn btn-secondary" type="submit">Search</button>
+        @if (!string.IsNullOrWhiteSpace(Model.Q))
+        {
+            <a class="btn btn-ghost" href="/Admin/Services">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="admin-card">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No services yet", "Describe what you offer and how clients can get started.", "wrench", "/Admin/Services/Create", "Add service"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:80px">Order</th>
+                        <th>Service</th>
+                        <th style="width:150px">Price</th>
+                        <th style="width:110px">Visibility</th>
+                        <th style="width:220px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up"><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down"><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@item.Title</strong>
+                                    <span>@(item.IconName ?? "sparkles")</span>
+                                </div>
+                            </td>
+                            <td class="cell-muted">@(item.StartingPrice is null ? "Not published" : $"{item.Currency} {item.StartingPrice:0.##}")</td>
+                            <td>
+                                @if (item.IsVisible) { <span class="badge badge-visible">Visible</span> }
+                                else { <span class="badge badge-hidden">Hidden</span> }
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/Services/Edit/@item.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    <form method="post" asp-action="ToggleVisible" asp-route-id="@item.Id">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="@(item.IsVisible ? "Hide" : "Show")"><partial name="_Icon" model="@("eye")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Delete" asp-route-id="@item.Id" data-confirm="Delete this service?">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Pager is not null)
+        {
+            <div class="admin-card-footer"><partial name="_Pager" model="Model.Pager" /></div>
+        }
+    }
+</div>

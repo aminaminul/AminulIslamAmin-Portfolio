@@ -1,0 +1,43 @@
+@model MediaFieldModel
+@{
+    var selected = Model.Selected;
+    var accept = Model.Document ? ".pdf,application/pdf" : "image/jpeg,image/png,image/webp,image/gif";
+}
+<div class="field media-field">
+    <label for="@(Model.Name)MediaId">@Model.Label</label>
+    <div class="media-preview">
+        @if (selected is not null)
+        {
+            if (selected.Kind == MediaKind.Image)
+            {
+                <img src="/media/@selected.Id" alt="" width="64" height="64" />
+            }
+            <span class="preview-meta">
+                <strong>@selected.OriginalName</strong>
+                <span>@((selected.SizeBytes / 1024.0).ToString("0.#")) KB · @selected.CreatedAt.ToLocalTime().ToString("d MMM yyyy")</span>
+                <a href="/media/@selected.Id" target="_blank" rel="noopener">Open file</a>
+            </span>
+        }
+        else
+        {
+            <span class="preview-empty">No file selected.</span>
+        }
+    </div>
+
+    <select id="@(Model.Name)MediaId" name="@(Model.Name)MediaId">
+        <option value="">— None —</option>
+        @foreach (var choice in Model.Choices)
+        {
+            <option value="@choice.Id" selected="@(choice.Id == Model.SelectedId)">
+                @choice.OriginalName (@choice.CreatedAt.ToLocalTime().ToString("d MMM yyyy"))
+            </option>
+        }
+    </select>
+
+    <input type="file" id="@(Model.Name)File" name="@(Model.Name)File" accept="@accept"
+           aria-describedby="@(Model.Name)FileHelp" />
+    <p class="hint" id="@(Model.Name)FileHelp">
+        @(Model.Hint ?? "Choose an existing file from the library, or upload a new one. Uploading replaces the selection.")
+        @(Model.Document ? " PDF only, up to 20 MB." : " JPEG, PNG, WebP or GIF, up to 8 MB.")
+    </p>
+</div>

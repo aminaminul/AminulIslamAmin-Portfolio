@@ -1,0 +1,13 @@
+@model EmptyStateModel
+<div class="empty-state" role="status">
+    <span class="empty-icon" aria-hidden="true"><partial name="_Icon" model="@(Model.Icon ?? "folder")" /></span>
+    <h3>@Model.Title</h3>
+    @if (!string.IsNullOrWhiteSpace(Model.Message))
+    {
+        <p>@Model.Message</p>
+    }
+    @if (Model.ActionUrl is not null && Model.ActionLabel is not null)
+    {
+        <a class="btn btn-secondary btn-sm" href="@Model.ActionUrl">@Model.ActionLabel</a>
+    }
+</div>

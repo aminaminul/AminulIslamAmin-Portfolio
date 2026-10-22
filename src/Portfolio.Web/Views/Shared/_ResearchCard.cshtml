@@ -1,0 +1,41 @@
+@model Research
+@{
+    var title = Model.Title.Pick(Model.TitleBn);
+    var abstractText = Model.Abstract.PickOptional(Model.AbstractBn);
+    var authors = string.Join(", ", Model.Authors.OrderBy(a => a.DisplayOrder).Select(a => a.Name));
+}
+<article class="research-item" data-reveal>
+    <div class="research-stamp" aria-hidden="true">
+        <span class="research-year">@(Model.PublicationDate?.Year.ToString() ?? "—")</span>
+        @if (!string.IsNullOrWhiteSpace(Model.Category?.Name))
+        {
+            <span class="research-category">@Model.Category.Name.Pick(Model.Category.NameBn)</span>
+        }
+    </div>
+    <div class="research-body">
+        <h3 class="research-title">
+            <a href="/research/@Model.Slug">@title</a>
+        </h3>
+        @if (!string.IsNullOrWhiteSpace(authors))
+        {
+            <p class="research-authors">@authors</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(abstractText))
+        {
+            <p class="research-abstract">@abstractText</p>
+        }
+        <div class="research-footer">
+            <ul class="chip-row">
+                @foreach (var tag in Model.Tags.Take(4))
+                {
+                    <li class="chip chip-muted">@tag.Tag?.Name</li>
+                }
+            </ul>
+            @if (!string.IsNullOrWhiteSpace(Model.PublicationVenue) || !string.IsNullOrWhiteSpace(Model.Journal))
+            {
+                <span class="research-venue">@(Model.Journal ?? Model.PublicationVenue)</span>
+            }
+            <a class="text-link" href="/research/@Model.Slug">@L["Read research"] <partial name="_Icon" model="@("arrow-right")" /></a>
+        </div>
+    </div>
+</article>

@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" /></xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType><xsd:attribute name="alias" type="xsd:string" /><xsd:attribute name="name" type="xsd:string" /></xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" /></xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="'{0}' and '{1}' do not match." xml:space="preserve">
+    <value>'{0}' and '{1}' do not match.</value>
+  </data>
+  <data name="A complete overview of my experience" xml:space="preserve">
+    <value>A complete overview of my experience</value>
+  </data>
+  <data name="A selection of work, side projects and experiments. Only published projects are listed." xml:space="preserve">
+    <value>A selection of work, side projects and experiments. Only published projects are listed.</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Abstract" xml:space="preserve">
+    <value>Abstract</value>
+  </data>
+  <data name="Academic background" xml:space="preserve">
+    <value>Academic background</value>
+  </data>
+  <data name="Achievements" xml:space="preserve">
+    <value>Achievements</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="Admin sign in" xml:space="preserve">
+    <value>Admin sign in</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="All categories" xml:space="preserve">
+    <value>All categories</value>
+  </data>
+  <data name="All projects" xml:space="preserve">
+    <value>All projects</value>
+  </data>
+  <data name="All research" xml:space="preserve">
+    <value>All research</value>
+  </data>
+  <data name="All rights reserved." xml:space="preserve">
+    <value>All rights reserved.</value>
+  </data>
+  <data name="All services" xml:space="preserve">
+    <value>All services</value>
+  </data>
+  <data name="All years" xml:space="preserve">
+    <value>All years</value>
+  </data>
+  <data name="Apply filters" xml:space="preserve">
+    <value>Apply filters</value>
+  </data>
+  <data name="Archived" xml:space="preserve">
+    <value>Archived</value>
+  </data>
+  <data name="Authors" xml:space="preserve">
+    <value>Authors</value>
+  </data>
+  <data name="Back to home" xml:space="preserve">
+    <value>Back to home</value>
+  </data>
+  <data name="Biography coming soon" xml:space="preserve">
+    <value>Biography coming soon</value>
+  </data>
+  <data name="Breadcrumb" xml:space="preserve">
+    <value>Breadcrumb</value>
+  </data>
+  <data name="Built with ASP.NET Core" xml:space="preserve">
+    <value>Built with ASP.NET Core</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Certifications" xml:space="preserve">
+    <value>Certifications</value>
+  </data>
+  <data name="Certifications &amp; credentials" xml:space="preserve">
+    <value>Certifications &amp; credentials</value>
+  </data>
+  <data name="Clear filters" xml:space="preserve">
+    <value>Clear filters</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Conclusion" xml:space="preserve">
+    <value>Conclusion</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="Contact details" xml:space="preserve">
+    <value>Contact details</value>
+  </data>
+  <data name="Contact page" xml:space="preserve">
+    <value>Contact page</value>
+  </data>
+  <data name="Datasets" xml:space="preserve">
+    <value>Datasets</value>
+  </data>
+  <data name="Discussion" xml:space="preserve">
+    <value>Discussion</value>
+  </data>
+  <data name="Download PDF" xml:space="preserve">
+    <value>Download PDF</value>
+  </data>
+  <data name="Education" xml:space="preserve">
+    <value>Education</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Email address" xml:space="preserve">
+    <value>Email address</value>
+  </data>
+  <data name="Email delivery is not configured, so your message is saved to the site inbox instead." xml:space="preserve">
+    <value>Email delivery is not configured, so your message is saved to the site inbox instead.</value>
+  </data>
+  <data name="Experience" xml:space="preserve">
+    <value>Experience</value>
+  </data>
+  <data name="Experiments" xml:space="preserve">
+    <value>Experiments</value>
+  </data>
+  <data name="Expires" xml:space="preserve">
+    <value>Expires</value>
+  </data>
+  <data name="Explore" xml:space="preserve">
+    <value>Explore</value>
+  </data>
+  <data name="Explore all skills" xml:space="preserve">
+    <value>Explore all skills</value>
+  </data>
+  <data name="Filter by category" xml:space="preserve">
+    <value>Filter by category</value>
+  </data>
+  <data name="Filtered by tag" xml:space="preserve">
+    <value>Filtered by tag</value>
+  </data>
+  <data name="Findings" xml:space="preserve">
+    <value>Findings</value>
+  </data>
+  <data name="Footer navigation" xml:space="preserve">
+    <value>Footer navigation</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="Full experience" xml:space="preserve">
+    <value>Full experience</value>
+  </data>
+  <data name="Future work" xml:space="preserve">
+    <value>Future work</value>
+  </data>
+  <data name="Gallery" xml:space="preserve">
+    <value>Gallery</value>
+  </data>
+  <data name="Get in touch" xml:space="preserve">
+    <value>Get in touch</value>
+  </data>
+  <data name="Have a project or a role in mind? Send a message and I will get back to you." xml:space="preserve">
+    <value>Have a project or a role in mind? Send a message and I will get back to you.</value>
+  </data>
+  <data name="Have a project that needs these skills? Let's talk about it." xml:space="preserve">
+    <value>Have a project that needs these skills? Let's talk about it.</value>
+  </data>
+  <data name="Have a question or a project in mind? Send a message to {0}." xml:space="preserve">
+    <value>Have a question or a project in mind? Send a message to {0}.</value>
+  </data>
+  <data name="Have a similar project?" xml:space="preserve">
+    <value>Have a similar project?</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="How I can help" xml:space="preserve">
+    <value>How I can help</value>
+  </data>
+  <data name="I agree to be contacted about this message." xml:space="preserve">
+    <value>I agree to be contacted about this message.</value>
+  </data>
+  <data name="I'm happy to discuss requirements and how I can help." xml:space="preserve">
+    <value>I'm happy to discuss requirements and how I can help.</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="In progress" xml:space="preserve">
+    <value>In progress</value>
+  </data>
+  <data name="Introduction" xml:space="preserve">
+    <value>Introduction</value>
+  </data>
+  <data name="Issued" xml:space="preserve">
+    <value>Issued</value>
+  </data>
+  <data name="Journal" xml:space="preserve">
+    <value>Journal</value>
+  </data>
+  <data name="Key features" xml:space="preserve">
+    <value>Key features</value>
+  </data>
+  <data name="Keywords" xml:space="preserve">
+    <value>Keywords</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Let's build something together" xml:space="preserve">
+    <value>Let's build something together</value>
+  </data>
+  <data name="Limitations" xml:space="preserve">
+    <value>Limitations</value>
+  </data>
+  <data name="Live demo" xml:space="preserve">
+    <value>Live demo</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="Main navigation" xml:space="preserve">
+    <value>Main navigation</value>
+  </data>
+  <data name="Maintained" xml:space="preserve">
+    <value>Maintained</value>
+  </data>
+  <data name="Menu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Methodology" xml:space="preserve">
+    <value>Methodology</value>
+  </data>
+  <data name="Mobile navigation" xml:space="preserve">
+    <value>Mobile navigation</value>
+  </data>
+  <data name="More about me" xml:space="preserve">
+    <value>More about me</value>
+  </data>
+  <data name="More details" xml:space="preserve">
+    <value>More details</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="No matching projects" xml:space="preserve">
+    <value>No matching projects</value>
+  </data>
+  <data name="No research found" xml:space="preserve">
+    <value>No research found</value>
+  </data>
+  <data name="No services listed yet" xml:space="preserve">
+    <value>No services listed yet</value>
+  </data>
+  <data name="No skills listed yet" xml:space="preserve">
+    <value>No skills listed yet</value>
+  </data>
+  <data name="Only signed-in administrators can see this page." xml:space="preserve">
+    <value>Only signed-in administrators can see this page.</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="Page" xml:space="preserve">
+    <value>Page</value>
+  </data>
+  <data name="Pagination" xml:space="preserve">
+    <value>Pagination</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Planned" xml:space="preserve">
+    <value>Planned</value>
+  </data>
+  <data name="Portfolio" xml:space="preserve">
+    <value>Portfolio</value>
+  </data>
+  <data name="Present" xml:space="preserve">
+    <value>Present</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="Professional experience" xml:space="preserve">
+    <value>Professional experience</value>
+  </data>
+  <data name="Profiles" xml:space="preserve">
+    <value>Profiles</value>
+  </data>
+  <data name="Project details" xml:space="preserve">
+    <value>Project details</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projects</value>
+  </data>
+  <data name="Projects are coming soon" xml:space="preserve">
+    <value>Projects are coming soon</value>
+  </data>
+  <data name="Publication details" xml:space="preserve">
+    <value>Publication details</value>
+  </data>
+  <data name="Published" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="Published projects will appear here as soon as they are ready." xml:space="preserve">
+    <value>Published projects will appear here as soon as they are ready.</value>
+  </data>
+  <data name="Published projects will be listed here." xml:space="preserve">
+    <value>Published projects will be listed here.</value>
+  </data>
+  <data name="Published research matching these filters will appear here." xml:space="preserve">
+    <value>Published research matching these filters will appear here.</value>
+  </data>
+  <data name="Published research, methods and findings. Drafts and archived work are not listed." xml:space="preserve">
+    <value>Published research, methods and findings. Drafts and archived work are not listed.</value>
+  </data>
+  <data name="Read research" xml:space="preserve">
+    <value>Read research</value>
+  </data>
+  <data name="References" xml:space="preserve">
+    <value>References</value>
+  </data>
+  <data name="Related projects" xml:space="preserve">
+    <value>Related projects</value>
+  </data>
+  <data name="Related research" xml:space="preserve">
+    <value>Related research</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Repository" xml:space="preserve">
+    <value>Repository</value>
+  </data>
+  <data name="Research" xml:space="preserve">
+    <value>Research</value>
+  </data>
+  <data name="Research &amp; publications" xml:space="preserve">
+    <value>Research &amp; publications</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Search projects" xml:space="preserve">
+    <value>Search projects</value>
+  </data>
+  <data name="Search projects or technologies" xml:space="preserve">
+    <value>Search projects or technologies</value>
+  </data>
+  <data name="Search research" xml:space="preserve">
+    <value>Search research</value>
+  </data>
+  <data name="Search titles, abstracts and keywords" xml:space="preserve">
+    <value>Search titles, abstracts and keywords</value>
+  </data>
+  <data name="Selected achievements" xml:space="preserve">
+    <value>Selected achievements</value>
+  </data>
+  <data name="Selected projects" xml:space="preserve">
+    <value>Selected projects</value>
+  </data>
+  <data name="Send message" xml:space="preserve">
+    <value>Send message</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="Services added in the admin panel will be listed here." xml:space="preserve">
+    <value>Services added in the admin panel will be listed here.</value>
+  </data>
+  <data name="Services offered by" xml:space="preserve">
+    <value>Services offered by</value>
+  </data>
+  <data name="Share your goals and requirements, and I will reply with the next steps." xml:space="preserve">
+    <value>Share your goals and requirements, and I will reply with the next steps.</value>
+  </data>
+  <data name="Skill categories and technologies added in the admin panel will appear here." xml:space="preserve">
+    <value>Skill categories and technologies added in the admin panel will appear here.</value>
+  </data>
+  <data name="Skills" xml:space="preserve">
+    <value>Skills</value>
+  </data>
+  <data name="Skills &amp; technologies" xml:space="preserve">
+    <value>Skills &amp; technologies</value>
+  </data>
+  <data name="Skills added in the admin panel appear here, grouped by category." xml:space="preserve">
+    <value>Skills added in the admin panel appear here, grouped by category.</value>
+  </data>
+  <data name="Skip to content" xml:space="preserve">
+    <value>Skip to content</value>
+  </data>
+  <data name="Social profiles" xml:space="preserve">
+    <value>Social profiles</value>
+  </data>
+  <data name="Stack" xml:space="preserve">
+    <value>Stack</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>Started</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Subject" xml:space="preserve">
+    <value>Subject</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="Technologies" xml:space="preserve">
+    <value>Technologies</value>
+  </data>
+  <data name="Tell me about your project" xml:space="preserve">
+    <value>Tell me about your project</value>
+  </data>
+  <data name="Tell me about your project, role or question." xml:space="preserve">
+    <value>Tell me about your project, role or question.</value>
+  </data>
+  <data name="Testimonials" xml:space="preserve">
+    <value>Testimonials</value>
+  </data>
+  <data name="The contact form is currently closed" xml:space="preserve">
+    <value>The contact form is currently closed</value>
+  </data>
+  <data name="The field {0} must be a number." xml:space="preserve">
+    <value>The field {0} must be a number.</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a minimum length of '{1}'." xml:space="preserve">
+    <value>The field {0} must be a string or array type with a minimum length of '{1}'.</value>
+  </data>
+  <data name="The field {0} must be a string with a maximum length of {1}." xml:space="preserve">
+    <value>The field {0} must be a string with a maximum length of {1}.</value>
+  </data>
+  <data name="The field {0} must be a string with a minimum length of {2} and a maximum length of {1}." xml:space="preserve">
+    <value>The field {0} must be a string with a minimum length of {2} and a maximum length of {1}.</value>
+  </data>
+  <data name="The field {0} must be between {1} and {2}." xml:space="preserve">
+    <value>The field {0} must be between {1} and {2}.</value>
+  </data>
+  <data name="The owner has not published an about section yet." xml:space="preserve">
+    <value>The owner has not published an about section yet.</value>
+  </data>
+  <data name="The problem" xml:space="preserve">
+    <value>The problem</value>
+  </data>
+  <data name="The solution" xml:space="preserve">
+    <value>The solution</value>
+  </data>
+  <data name="The tools and technologies {0} works with." xml:space="preserve">
+    <value>The tools and technologies {0} works with.</value>
+  </data>
+  <data name="The value '{0}' is not valid for {1}." xml:space="preserve">
+    <value>The value '{0}' is not valid for {1}.</value>
+  </data>
+  <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
+    <value>The {0} field is not a valid e-mail address.</value>
+  </data>
+  <data name="The {0} field is required." xml:space="preserve">
+    <value>The {0} field is required.</value>
+  </data>
+  <data name="Timeline" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="Toggle theme" xml:space="preserve">
+    <value>Toggle theme</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="Try a different search term or clear the filters." xml:space="preserve">
+    <value>Try a different search term or clear the filters.</value>
+  </data>
+  <data name="Venue" xml:space="preserve">
+    <value>Venue</value>
+  </data>
+  <data name="Verify credential" xml:space="preserve">
+    <value>Verify credential</value>
+  </data>
+  <data name="View projects" xml:space="preserve">
+    <value>View projects</value>
+  </data>
+  <data name="View publication" xml:space="preserve">
+    <value>View publication</value>
+  </data>
+  <data name="What collaborators say" xml:space="preserve">
+    <value>What collaborators say</value>
+  </data>
+  <data name="Where I have worked" xml:space="preserve">
+    <value>Where I have worked</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Year</value>
+  </data>
+  <data name="You can still reach out by email." xml:space="preserve">
+    <value>You can still reach out by email.</value>
+  </data>
+  <data name="Your details are only used to reply to your message." xml:space="preserve">
+    <value>Your details are only used to reply to your message.</value>
+  </data>
+  <data name="Your name" xml:space="preserve">
+    <value>Your name</value>
+  </data>
+  <data name="of" xml:space="preserve">
+    <value>of</value>
+  </data>
+  <data name="project" xml:space="preserve">
+    <value>project</value>
+  </data>
+  <data name="projectsPlural" xml:space="preserve">
+    <value>projects</value>
+  </data>
+  <data name="publication" xml:space="preserve">
+    <value>publication</value>
+  </data>
+  <data name="publications" xml:space="preserve">
+    <value>publications</value>
+  </data>
+</root>

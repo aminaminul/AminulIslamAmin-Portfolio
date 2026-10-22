@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" /></xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType><xsd:attribute name="alias" type="xsd:string" /><xsd:attribute name="name" type="xsd:string" /></xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence><xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" /></xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="'{0}' and '{1}' do not match." xml:space="preserve">
+    <value>'{0}' এবং '{1}' মিলছে না।</value>
+  </data>
+  <data name="A complete overview of my experience" xml:space="preserve">
+    <value>আমার অভিজ্ঞতার পূর্ণ বিবরণ</value>
+  </data>
+  <data name="A selection of work, side projects and experiments. Only published projects are listed." xml:space="preserve">
+    <value>কাজ, সাইড প্রজেক্ট ও পরীক্ষা-নিরীক্ষার নির্বাচিত সংগ্রহ। শুধু প্রকাশিত প্রকল্প এখানে দেখা যাবে।</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>পরিচিতি</value>
+  </data>
+  <data name="Abstract" xml:space="preserve">
+    <value>সারসংক্ষেপ</value>
+  </data>
+  <data name="Academic background" xml:space="preserve">
+    <value>শিক্ষাগত পটভূমি</value>
+  </data>
+  <data name="Achievements" xml:space="preserve">
+    <value>অর্জন</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>অ্যাডমিন</value>
+  </data>
+  <data name="Admin sign in" xml:space="preserve">
+    <value>অ্যাডমিন সাইন ইন</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>সব</value>
+  </data>
+  <data name="All categories" xml:space="preserve">
+    <value>সব বিভাগ</value>
+  </data>
+  <data name="All projects" xml:space="preserve">
+    <value>সব প্রকল্প</value>
+  </data>
+  <data name="All research" xml:space="preserve">
+    <value>সব গবেষণা</value>
+  </data>
+  <data name="All rights reserved." xml:space="preserve">
+    <value>সর্বস্বত্ব সংরক্ষিত।</value>
+  </data>
+  <data name="All services" xml:space="preserve">
+    <value>সব সেবা</value>
+  </data>
+  <data name="All years" xml:space="preserve">
+    <value>সব বছর</value>
+  </data>
+  <data name="Apply filters" xml:space="preserve">
+    <value>ফিল্টার প্রয়োগ করুন</value>
+  </data>
+  <data name="Archived" xml:space="preserve">
+    <value>আর্কাইভ করা</value>
+  </data>
+  <data name="Authors" xml:space="preserve">
+    <value>লেখক</value>
+  </data>
+  <data name="Back to home" xml:space="preserve">
+    <value>হোমে ফিরুন</value>
+  </data>
+  <data name="Biography coming soon" xml:space="preserve">
+    <value>পরিচিতি শীঘ্রই আসছে</value>
+  </data>
+  <data name="Breadcrumb" xml:space="preserve">
+    <value>পথনির্দেশ</value>
+  </data>
+  <data name="Built with ASP.NET Core" xml:space="preserve">
+    <value>ASP.NET Core দিয়ে তৈরি</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>বিভাগ</value>
+  </data>
+  <data name="Certifications" xml:space="preserve">
+    <value>সার্টিফিকেশন</value>
+  </data>
+  <data name="Certifications &amp; credentials" xml:space="preserve">
+    <value>সার্টিফিকেশন ও সনদ</value>
+  </data>
+  <data name="Clear filters" xml:space="preserve">
+    <value>ফিল্টার মুছুন</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>সম্পন্ন</value>
+  </data>
+  <data name="Conclusion" xml:space="preserve">
+    <value>উপসংহার</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>যোগাযোগ</value>
+  </data>
+  <data name="Contact details" xml:space="preserve">
+    <value>যোগাযোগের তথ্য</value>
+  </data>
+  <data name="Contact page" xml:space="preserve">
+    <value>যোগাযোগের পাতা</value>
+  </data>
+  <data name="Datasets" xml:space="preserve">
+    <value>ডেটাসেট</value>
+  </data>
+  <data name="Discussion" xml:space="preserve">
+    <value>আলোচনা</value>
+  </data>
+  <data name="Download PDF" xml:space="preserve">
+    <value>PDF ডাউনলোড</value>
+  </data>
+  <data name="Education" xml:space="preserve">
+    <value>শিক্ষা</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>ইমেইল</value>
+  </data>
+  <data name="Email address" xml:space="preserve">
+    <value>ইমেইল ঠিকানা</value>
+  </data>
+  <data name="Email delivery is not configured, so your message is saved to the site inbox instead." xml:space="preserve">
+    <value>ইমেইল ডেলিভারি কনফিগার করা নেই, তাই আপনার বার্তা সাইটের ইনবক্সে সংরক্ষণ করা হবে।</value>
+  </data>
+  <data name="Experience" xml:space="preserve">
+    <value>অভিজ্ঞতা</value>
+  </data>
+  <data name="Experiments" xml:space="preserve">
+    <value>পরীক্ষা-নিরীক্ষা</value>
+  </data>
+  <data name="Expires" xml:space="preserve">
+    <value>মেয়াদ শেষ</value>
+  </data>
+  <data name="Explore" xml:space="preserve">
+    <value>দেখুন</value>
+  </data>
+  <data name="Explore all skills" xml:space="preserve">
+    <value>সব দক্ষতা দেখুন</value>
+  </data>
+  <data name="Filter by category" xml:space="preserve">
+    <value>বিভাগ অনুযায়ী ফিল্টার</value>
+  </data>
+  <data name="Filtered by tag" xml:space="preserve">
+    <value>ট্যাগ অনুযায়ী ফিল্টার</value>
+  </data>
+  <data name="Findings" xml:space="preserve">
+    <value>ফলাফল</value>
+  </data>
+  <data name="Footer navigation" xml:space="preserve">
+    <value>ফুটার নেভিগেশন</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>শুরু</value>
+  </data>
+  <data name="Full experience" xml:space="preserve">
+    <value>সম্পূর্ণ অভিজ্ঞতা</value>
+  </data>
+  <data name="Future work" xml:space="preserve">
+    <value>ভবিষ্যৎ কাজ</value>
+  </data>
+  <data name="Gallery" xml:space="preserve">
+    <value>গ্যালারি</value>
+  </data>
+  <data name="Get in touch" xml:space="preserve">
+    <value>যোগাযোগ করুন</value>
+  </data>
+  <data name="Have a project or a role in mind? Send a message and I will get back to you." xml:space="preserve">
+    <value>কোনো প্রকল্প বা পদ মাথায় আছে? বার্তা পাঠান, আমি উত্তর দেব।</value>
+  </data>
+  <data name="Have a project that needs these skills? Let's talk about it." xml:space="preserve">
+    <value>এই দক্ষতাগুলো প্রয়োজন এমন প্রকল্প আছে? কথা বলি।</value>
+  </data>
+  <data name="Have a question or a project in mind? Send a message to {0}." xml:space="preserve">
+    <value>প্রশ্ন বা প্রকল্পের পরিকল্পনা আছে? {0}-কে বার্তা পাঠান।</value>
+  </data>
+  <data name="Have a similar project?" xml:space="preserve">
+    <value>অনুরূপ প্রকল্প আছে?</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>হোম</value>
+  </data>
+  <data name="How I can help" xml:space="preserve">
+    <value>আমি যেভাবে সহায়তা করতে পারি</value>
+  </data>
+  <data name="I agree to be contacted about this message." xml:space="preserve">
+    <value>এই বার্তার বিষয়ে যোগাযোগে সম্মত আছি।</value>
+  </data>
+  <data name="I'm happy to discuss requirements and how I can help." xml:space="preserve">
+    <value>প্রয়োজনীয়তা এবং কীভাবে সহায়তা করতে পারি, তা নিয়ে আলোচনা করতে প্রস্তুত।</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>আইডি</value>
+  </data>
+  <data name="In progress" xml:space="preserve">
+    <value>চলমান</value>
+  </data>
+  <data name="Introduction" xml:space="preserve">
+    <value>ভূমিকা</value>
+  </data>
+  <data name="Issued" xml:space="preserve">
+    <value>ইস্যু করা হয়েছে</value>
+  </data>
+  <data name="Journal" xml:space="preserve">
+    <value>জার্নাল</value>
+  </data>
+  <data name="Key features" xml:space="preserve">
+    <value>প্রধান বৈশিষ্ট্য</value>
+  </data>
+  <data name="Keywords" xml:space="preserve">
+    <value>কীওয়ার্ড</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>ভাষা</value>
+  </data>
+  <data name="Let's build something together" xml:space="preserve">
+    <value>চলুন একসাথে কিছু তৈরি করি</value>
+  </data>
+  <data name="Limitations" xml:space="preserve">
+    <value>সীমাবদ্ধতা</value>
+  </data>
+  <data name="Live demo" xml:space="preserve">
+    <value>লাইভ ডেমো</value>
+  </data>
+  <data name="Location" xml:space="preserve">
+    <value>অবস্থান</value>
+  </data>
+  <data name="Main navigation" xml:space="preserve">
+    <value>প্রধান নেভিগেশন</value>
+  </data>
+  <data name="Maintained" xml:space="preserve">
+    <value>রক্ষণাবেক্ষণাধীন</value>
+  </data>
+  <data name="Menu" xml:space="preserve">
+    <value>মেনু</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>বার্তা</value>
+  </data>
+  <data name="Methodology" xml:space="preserve">
+    <value>পদ্ধতি</value>
+  </data>
+  <data name="Mobile navigation" xml:space="preserve">
+    <value>মোবাইল নেভিগেশন</value>
+  </data>
+  <data name="More about me" xml:space="preserve">
+    <value>আমার সম্পর্কে আরও</value>
+  </data>
+  <data name="More details" xml:space="preserve">
+    <value>আরও বিস্তারিত</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>পরবর্তী</value>
+  </data>
+  <data name="No matching projects" xml:space="preserve">
+    <value>কোনো মিলে যাওয়া প্রকল্প নেই</value>
+  </data>
+  <data name="No research found" xml:space="preserve">
+    <value>কোনো গবেষণা পাওয়া যায়নি</value>
+  </data>
+  <data name="No services listed yet" xml:space="preserve">
+    <value>এখনো কোনো সেবা যোগ করা হয়নি</value>
+  </data>
+  <data name="No skills listed yet" xml:space="preserve">
+    <value>এখনো কোনো দক্ষতা যোগ করা হয়নি</value>
+  </data>
+  <data name="Only signed-in administrators can see this page." xml:space="preserve">
+    <value>শুধু সাইন-ইন করা অ্যাডমিন এই পৃষ্ঠাটি দেখতে পারেন।</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>সারসংক্ষেপ</value>
+  </data>
+  <data name="Page" xml:space="preserve">
+    <value>পৃষ্ঠা</value>
+  </data>
+  <data name="Pagination" xml:space="preserve">
+    <value>পৃষ্ঠা বিভাজন</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>ফোন</value>
+  </data>
+  <data name="Planned" xml:space="preserve">
+    <value>পরিকল্পিত</value>
+  </data>
+  <data name="Portfolio" xml:space="preserve">
+    <value>পোর্টফোলিও</value>
+  </data>
+  <data name="Present" xml:space="preserve">
+    <value>বর্তমান</value>
+  </data>
+  <data name="Preview" xml:space="preserve">
+    <value>প্রিভিউ</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>পূর্ববর্তী</value>
+  </data>
+  <data name="Professional experience" xml:space="preserve">
+    <value>পেশাগত অভিজ্ঞতা</value>
+  </data>
+  <data name="Profiles" xml:space="preserve">
+    <value>প্রোফাইল</value>
+  </data>
+  <data name="Project details" xml:space="preserve">
+    <value>প্রকল্পের বিবরণ</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>প্রকল্প</value>
+  </data>
+  <data name="Projects are coming soon" xml:space="preserve">
+    <value>প্রকল্প শীঘ্রই আসছে</value>
+  </data>
+  <data name="Publication details" xml:space="preserve">
+    <value>প্রকাশনার বিবরণ</value>
+  </data>
+  <data name="Published" xml:space="preserve">
+    <value>প্রকাশিত</value>
+  </data>
+  <data name="Published projects will appear here as soon as they are ready." xml:space="preserve">
+    <value>প্রকাশিত প্রকল্প প্রস্তুত হলে এখানে দেখা যাবে।</value>
+  </data>
+  <data name="Published projects will be listed here." xml:space="preserve">
+    <value>প্রকাশিত প্রকল্প এখানে তালিকাভুক্ত হবে।</value>
+  </data>
+  <data name="Published research matching these filters will appear here." xml:space="preserve">
+    <value>এই ফিল্টারের সাথে মিলে যাওয়া প্রকাশিত গবেষণা এখানে দেখা যাবে।</value>
+  </data>
+  <data name="Published research, methods and findings. Drafts and archived work are not listed." xml:space="preserve">
+    <value>প্রকাশিত গবেষণা, পদ্ধতি ও ফলাফল। ড্রাফট ও আর্কাইভ করা কাজ এখানে নেই।</value>
+  </data>
+  <data name="Read research" xml:space="preserve">
+    <value>গবেষণা পড়ুন</value>
+  </data>
+  <data name="References" xml:space="preserve">
+    <value>তথ্যসূত্র</value>
+  </data>
+  <data name="Related projects" xml:space="preserve">
+    <value>সম্পর্কিত প্রকল্প</value>
+  </data>
+  <data name="Related research" xml:space="preserve">
+    <value>সম্পর্কিত গবেষণা</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>সরান</value>
+  </data>
+  <data name="Repository" xml:space="preserve">
+    <value>রিপোজিটরি</value>
+  </data>
+  <data name="Research" xml:space="preserve">
+    <value>গবেষণা</value>
+  </data>
+  <data name="Research &amp; publications" xml:space="preserve">
+    <value>গবেষণা ও প্রকাশনা</value>
+  </data>
+  <data name="Resume" xml:space="preserve">
+    <value>সিভি</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>খুঁজুন</value>
+  </data>
+  <data name="Search projects" xml:space="preserve">
+    <value>প্রকল্প খুঁজুন</value>
+  </data>
+  <data name="Search projects or technologies" xml:space="preserve">
+    <value>প্রকল্প বা প্রযুক্তি খুঁজুন</value>
+  </data>
+  <data name="Search research" xml:space="preserve">
+    <value>গবেষণা খুঁজুন</value>
+  </data>
+  <data name="Search titles, abstracts and keywords" xml:space="preserve">
+    <value>শিরোনাম, সারসংক্ষেপ ও কীওয়ার্ড খুঁজুন</value>
+  </data>
+  <data name="Selected achievements" xml:space="preserve">
+    <value>নির্বাচিত অর্জন</value>
+  </data>
+  <data name="Selected projects" xml:space="preserve">
+    <value>নির্বাচিত প্রকল্প</value>
+  </data>
+  <data name="Send message" xml:space="preserve">
+    <value>বার্তা পাঠান</value>
+  </data>
+  <data name="Services" xml:space="preserve">
+    <value>সেবা</value>
+  </data>
+  <data name="Services added in the admin panel will be listed here." xml:space="preserve">
+    <value>অ্যাডমিন প্যানেল থেকে যোগ করা সেবা এখানে দেখা যাবে।</value>
+  </data>
+  <data name="Services offered by" xml:space="preserve">
+    <value>সেবা প্রদান করছেন</value>
+  </data>
+  <data name="Share your goals and requirements, and I will reply with the next steps." xml:space="preserve">
+    <value>আপনার লক্ষ্য ও প্রয়োজন জানান, আমি পরবর্তী পদক্ষেপ জানাব।</value>
+  </data>
+  <data name="Skill categories and technologies added in the admin panel will appear here." xml:space="preserve">
+    <value>অ্যাডমিন প্যানেল থেকে যোগ করা দক্ষতা ও প্রযুক্তি এখানে দেখা যাবে।</value>
+  </data>
+  <data name="Skills" xml:space="preserve">
+    <value>দক্ষতা</value>
+  </data>
+  <data name="Skills &amp; technologies" xml:space="preserve">
+    <value>দক্ষতা ও প্রযুক্তি</value>
+  </data>
+  <data name="Skills added in the admin panel appear here, grouped by category." xml:space="preserve">
+    <value>অ্যাডমিন প্যানেলে যোগ করা দক্ষতা বিভাগ অনুযায়ী এখানে দেখা যায়।</value>
+  </data>
+  <data name="Skip to content" xml:space="preserve">
+    <value>মূল কনটেন্টে যান</value>
+  </data>
+  <data name="Social profiles" xml:space="preserve">
+    <value>সোশ্যাল প্রোফাইল</value>
+  </data>
+  <data name="Stack" xml:space="preserve">
+    <value>টেক স্ট্যাক</value>
+  </data>
+  <data name="Started" xml:space="preserve">
+    <value>শুরু</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>অবস্থা</value>
+  </data>
+  <data name="Subject" xml:space="preserve">
+    <value>বিষয়</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>ট্যাগ</value>
+  </data>
+  <data name="Technologies" xml:space="preserve">
+    <value>প্রযুক্তি</value>
+  </data>
+  <data name="Tell me about your project" xml:space="preserve">
+    <value>আপনার প্রকল্প সম্পর্কে বলুন</value>
+  </data>
+  <data name="Tell me about your project, role or question." xml:space="preserve">
+    <value>আপনার প্রকল্প, পদ বা প্রশ্ন সম্পর্কে লিখুন।</value>
+  </data>
+  <data name="Testimonials" xml:space="preserve">
+    <value>প্রশংসাপত্র</value>
+  </data>
+  <data name="The contact form is currently closed" xml:space="preserve">
+    <value>যোগাযোগ ফর্ম এখন বন্ধ</value>
+  </data>
+  <data name="The field {0} must be a number." xml:space="preserve">
+    <value>{0} ফিল্ডে একটি সংখ্যা দিন।</value>
+  </data>
+  <data name="The field {0} must be a string or array type with a minimum length of '{1}'." xml:space="preserve">
+    <value>{0} ফিল্ডে সর্বনিম্ন {1}টি অক্ষর থাকতে হবে।</value>
+  </data>
+  <data name="The field {0} must be a string with a maximum length of {1}." xml:space="preserve">
+    <value>{0} ফিল্ডে সর্বোচ্চ {1}টি অক্ষর থাকতে পারে।</value>
+  </data>
+  <data name="The field {0} must be a string with a minimum length of {2} and a maximum length of {1}." xml:space="preserve">
+    <value>{0} ফিল্ডে সর্বনিম্ন {2} এবং সর্বোচ্চ {1}টি অক্ষর থাকতে হবে।</value>
+  </data>
+  <data name="The field {0} must be between {1} and {2}." xml:space="preserve">
+    <value>{0} ফিল্ড {1} থেকে {2} এর মধ্যে হতে হবে।</value>
+  </data>
+  <data name="The owner has not published an about section yet." xml:space="preserve">
+    <value>মালিক এখনো পরিচিতি অংশ প্রকাশ করেননি।</value>
+  </data>
+  <data name="The problem" xml:space="preserve">
+    <value>সমস্যা</value>
+  </data>
+  <data name="The solution" xml:space="preserve">
+    <value>সমাধান</value>
+  </data>
+  <data name="The tools and technologies {0} works with." xml:space="preserve">
+    <value>{0} যেসব টুল ও প্রযুক্তি ব্যবহার করেন।</value>
+  </data>
+  <data name="The value '{0}' is not valid for {1}." xml:space="preserve">
+    <value>'{0}' মানটি {1} এর জন্য বৈধ নয়।</value>
+  </data>
+  <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
+    <value>{0} ফিল্ডে একটি বৈধ ইমেইল ঠিকানা দিন।</value>
+  </data>
+  <data name="The {0} field is required." xml:space="preserve">
+    <value>{0} ফিল্ডটি আবশ্যক।</value>
+  </data>
+  <data name="Timeline" xml:space="preserve">
+    <value>সময়কাল</value>
+  </data>
+  <data name="Toggle theme" xml:space="preserve">
+    <value>থিম পরিবর্তন</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>টুলস</value>
+  </data>
+  <data name="Try a different search term or clear the filters." xml:space="preserve">
+    <value>অন্য শব্দে খুঁজুন অথবা ফিল্টার মুছুন।</value>
+  </data>
+  <data name="Venue" xml:space="preserve">
+    <value>স্থান</value>
+  </data>
+  <data name="Verify credential" xml:space="preserve">
+    <value>সনদ যাচাই করুন</value>
+  </data>
+  <data name="View projects" xml:space="preserve">
+    <value>প্রকল্প দেখুন</value>
+  </data>
+  <data name="View publication" xml:space="preserve">
+    <value>প্রকাশনা দেখুন</value>
+  </data>
+  <data name="What collaborators say" xml:space="preserve">
+    <value>সহকর্মীরা যা বলেন</value>
+  </data>
+  <data name="Where I have worked" xml:space="preserve">
+    <value>যেখানে কাজ করেছি</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>বছর</value>
+  </data>
+  <data name="You can still reach out by email." xml:space="preserve">
+    <value>ইমেইলে যোগাযোগ করতে পারেন।</value>
+  </data>
+  <data name="Your details are only used to reply to your message." xml:space="preserve">
+    <value>আপনার তথ্য শুধু উত্তর দেওয়ার জন্য ব্যবহৃত হয়।</value>
+  </data>
+  <data name="Your name" xml:space="preserve">
+    <value>আপনার নাম</value>
+  </data>
+  <data name="of" xml:space="preserve">
+    <value>এর</value>
+  </data>
+  <data name="project" xml:space="preserve">
+    <value>প্রকল্প</value>
+  </data>
+  <data name="projectsPlural" xml:space="preserve">
+    <value>প্রকল্প</value>
+  </data>
+  <data name="publication" xml:space="preserve">
+    <value>প্রকাশনা</value>
+  </data>
+  <data name="publications" xml:space="preserve">
+    <value>প্রকাশনা</value>
+  </data>
+</root>

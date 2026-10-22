@@ -1,0 +1,82 @@
+@model IReadOnlyList<AboutSection>
+@{
+    ViewData["Title"] = "About me";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>About me</h1>
+        <p>Biography blocks shown on the home page and About page. Use Markdown for formatting; raw HTML is never rendered.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-primary btn-sm" href="/Admin/About/Create"><partial name="_Icon" model="@("plus")" /> New section</a>
+    </div>
+</div>
+
+<div class="admin-card">
+    @if (Model.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No about sections yet", "Write your first biography block to introduce yourself on the public site.", "book-open", "/Admin/About/Create", "Create about section"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:90px">Order</th>
+                        <th>Section</th>
+                        <th style="width:160px">Status</th>
+                        <th style="width:120px">Visibility</th>
+                        <th style="width:240px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up" @(item == Model.First() ? "disabled" : null)><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down" @(item == Model.Last() ? "disabled" : null)><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@item.Title</strong>
+                                    @if (!string.IsNullOrWhiteSpace(item.TitleBn))
+                                    {
+                                        <span lang="bn">@item.TitleBn</span>
+                                    }
+                                </div>
+                            </td>
+                            <td><partial name="_StatusBadge" model="item.Status" /></td>
+                            <td>
+                                @if (item.IsVisible) { <span class="badge badge-visible">Visible</span> }
+                                else { <span class="badge badge-hidden">Hidden</span> }
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/About/Preview/@item.Id" target="_blank" aria-label="Preview"><partial name="_Icon" model="@("eye")" /></a>
+                                    <a class="icon-action" href="/Admin/About/Edit/@item.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    <form method="post" asp-action="Delete" asp-route-id="@item.Id" data-confirm="Delete this about section? This cannot be undone.">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

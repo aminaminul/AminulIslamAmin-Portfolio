@@ -1,0 +1,89 @@
+@model AboutFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit about section" : "New about section";
+    ViewData["Section"] = "Portfolio";
+    var action = isEdit ? "Edit" : "Create";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Markdown is supported. Raw HTML is disabled at render time, so submitted markup cannot execute.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/About"><partial name="_Icon" model="@("arrow-left")" /> Back to list</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="About" asp-action="@action" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Content</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Title">Title (English) <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Title" required maxlength="160" />
+                <span class="field-error" asp-validation-for="Title"></span>
+            </div>
+            <div class="field">
+                <label asp-for="TitleBn">Title (Bangla)</label>
+                <input asp-for="TitleBn" maxlength="200" lang="bn" />
+                <span class="field-error" asp-validation-for="TitleBn"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Body">Body (English, Markdown)</label>
+                <textarea asp-for="Body" rows="10"></textarea>
+                <span class="hint">Paragraphs, lists, emphasis and links are supported. HTML tags are escaped.</span>
+                <span class="field-error" asp-validation-for="Body"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="BodyBn">Body (Bangla, Markdown)</label>
+                <textarea asp-for="BodyBn" rows="8" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="BodyBn"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Image</h2>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("Image", "Optional image", Model.ImageMediaId,
+                ViewData["ImageChoices"] as IEnumerable<MediaFile> ?? [], "Displayed alongside this section."))" />
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Publishing</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Status">Status</label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<ContentStatus>()"></select>
+                <span class="hint">Only published and visible sections appear on the public website.</span>
+                <span class="field-error" asp-validation-for="Status"></span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+                <span class="hint">Lower numbers appear first.</span>
+                <span class="field-error" asp-validation-for="DisplayOrder"></span>
+            </div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="IsVisible" />
+                <label for="IsVisible">Visible on the public website</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/About">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save changes" : "Create section")</span>
+        </button>
+    </div>
+</form>

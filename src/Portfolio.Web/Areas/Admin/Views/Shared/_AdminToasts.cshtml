@@ -1,0 +1,26 @@
+@{
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+}
+<div class="toast-stack" aria-live="polite" aria-atomic="true">
+    @if (!string.IsNullOrWhiteSpace(success))
+    {
+        <div class="toast success" role="status">
+            <partial name="_Icon" model="@("check")" />
+            <span>@success</span>
+            <button type="button" class="toast-close" data-toast-close aria-label="Dismiss">
+                <partial name="_Icon" model="@("x")" />
+            </button>
+        </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="toast error" role="alert">
+            <partial name="_Icon" model="@("alert-circle")" />
+            <span>@error</span>
+            <button type="button" class="toast-close" data-toast-close aria-label="Dismiss">
+                <partial name="_Icon" model="@("x")" />
+            </button>
+        </div>
+    }
+</div>

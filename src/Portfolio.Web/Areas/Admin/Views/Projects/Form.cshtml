@@ -1,0 +1,204 @@
+@model ProjectFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit project" : "New project";
+    ViewData["Section"] = "Portfolio";
+    var stages = new[] { ProjectStage.Planned, ProjectStage.InProgress, ProjectStage.Completed, ProjectStage.Maintained, ProjectStage.Archived };
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Required fields are marked. Long descriptions support Markdown; raw HTML is escaped.</p>
+    </div>
+    <div class="admin-actions">
+        @if (isEdit)
+        {
+            <a class="btn btn-secondary btn-sm" href="/Admin/Projects/Preview/@Model.Id" target="_blank"><partial name="_Icon" model="@("eye")" /> Preview</a>
+            <a class="btn btn-ghost btn-sm" href="/Admin/Projects/Images/@Model.Id"><partial name="_Icon" model="@("image")" /> Gallery</a>
+        }
+        <a class="btn btn-ghost btn-sm" href="/Admin/Projects"><partial name="_Icon" model="@("arrow-left")" /> Back</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Projects" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Basics</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Title">Title (English) <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Title" required maxlength="200" />
+                <span class="field-error" asp-validation-for="Title"></span>
+            </div>
+            <div class="field">
+                <label asp-for="TitleBn">Title (Bangla)</label>
+                <input asp-for="TitleBn" maxlength="240" lang="bn" />
+                <span class="field-error" asp-validation-for="TitleBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Slug">Slug</label>
+                <input asp-for="Slug" maxlength="160" placeholder="generated-from-the-title" />
+                <span class="hint">Leave empty to generate one. Must be unique; duplicate slugs are adjusted automatically.</span>
+                <span class="field-error" asp-validation-for="Slug"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Category">Category</label>
+                <input asp-for="Category" maxlength="80" list="project-category-options" />
+                <datalist id="project-category-options">
+                    <option value="Web application"></option>
+                    <option value="API"></option>
+                    <option value="Research"></option>
+                    <option value="Open source"></option>
+                </datalist>
+                <span class="field-error" asp-validation-for="Category"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Summary">Short summary (English)</label>
+                <textarea asp-for="Summary" rows="3" maxlength="500"></textarea>
+                <span class="hint">Shown on cards and in meta descriptions. Keep it under 300 characters.</span>
+                <span class="field-error" asp-validation-for="Summary"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="SummaryBn">Short summary (Bangla)</label>
+                <textarea asp-for="SummaryBn" rows="3" maxlength="600" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="SummaryBn"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Case study</h2>
+        <div class="form-grid">
+            <div class="field span-2">
+                <label asp-for="Description">Overview (Markdown)</label>
+                <textarea asp-for="Description" rows="8"></textarea>
+                <span class="field-error" asp-validation-for="Description"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="DescriptionBn">Overview (Bangla, Markdown)</label>
+                <textarea asp-for="DescriptionBn" rows="6" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="DescriptionBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ProblemStatement">Problem statement (Markdown)</label>
+                <textarea asp-for="ProblemStatement" rows="5"></textarea>
+                <span class="field-error" asp-validation-for="ProblemStatement"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solution">Solution (Markdown)</label>
+                <textarea asp-for="Solution" rows="5"></textarea>
+                <span class="field-error" asp-validation-for="Solution"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Features">Key features (Markdown list)</label>
+                <textarea asp-for="Features" rows="6"></textarea>
+                <span class="field-error" asp-validation-for="Features"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Links and timeline</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="RepositoryUrl">Repository URL</label>
+                <input asp-for="RepositoryUrl" type="url" maxlength="500" placeholder="https://github.com/..." />
+                <span class="field-error" asp-validation-for="RepositoryUrl"></span>
+            </div>
+            <div class="field">
+                <label asp-for="LiveUrl">Live demo URL</label>
+                <input asp-for="LiveUrl" type="url" maxlength="500" placeholder="https://..." />
+                <span class="field-error" asp-validation-for="LiveUrl"></span>
+            </div>
+            <div class="field">
+                <label asp-for="StartDate">Start date</label>
+                <input asp-for="StartDate" type="date" asp-format="{0:yyyy-MM-dd}" />
+                <span class="field-error" asp-validation-for="StartDate"></span>
+            </div>
+            <div class="field">
+                <label asp-for="EndDate">Completion date</label>
+                <input asp-for="EndDate" type="date" asp-format="{0:yyyy-MM-dd}" />
+                <span class="hint">Leave empty for an ongoing project.</span>
+                <span class="field-error" asp-validation-for="EndDate"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Stage">Project stage</label>
+                <select asp-for="Stage">
+                    @foreach (var stage in stages)
+                    {
+                        <option value="@stage" selected="@(Model.Stage == stage)">@stage</option>
+                    }
+                </select>
+                <span class="hint">Only mark a project completed when that is accurate.</span>
+                <span class="field-error" asp-validation-for="Stage"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Media</h2>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("CoverImage", "Cover image", Model.CoverImageMediaId,
+                ViewData["CoverImageChoices"] as IEnumerable<MediaFile> ?? [], "Used on cards, social previews and the project header."))" />
+            <div class="field">
+                <label for="GalleryUploads">Add gallery images</label>
+                <input id="GalleryUploads" name="GalleryUploads" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple />
+                <span class="hint">Up to 10 images at once. You can reorder, set the cover and remove images after saving.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Technology stack</h2>
+        <div class="field">
+            <label asp-for="TechnologiesCsv">Technologies</label>
+            <input asp-for="TechnologiesCsv" maxlength="400" placeholder="C#, ASP.NET Core, SQL Server" />
+            <span class="hint">Comma-separated. New technologies are added to the shared catalogue automatically.</span>
+            <span class="field-error" asp-validation-for="TechnologiesCsv"></span>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Publishing and SEO</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Status">Publication status</label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<ContentStatus>()"></select>
+                <span class="hint">Draft and archived projects are never available to visitors.</span>
+                <span class="field-error" asp-validation-for="Status"></span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+                <span class="field-error" asp-validation-for="DisplayOrder"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SeoTitle">SEO title</label>
+                <input asp-for="SeoTitle" maxlength="200" />
+                <span class="field-error" asp-validation-for="SeoTitle"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SeoDescription">SEO description</label>
+                <input asp-for="SeoDescription" maxlength="400" />
+                <span class="field-error" asp-validation-for="SeoDescription"></span>
+            </div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="IsFeatured" />
+                <label for="IsFeatured">Feature this project (shown first and on the home page)</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/Projects">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save project" : "Create project")</span>
+        </button>
+    </div>
+</form>

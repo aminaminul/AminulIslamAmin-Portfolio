@@ -1,0 +1,197 @@
+@model ResearchDetailViewModel
+@inject IMarkdownService Markdown
+@{
+    var record = Model.Research;
+    var title = record.Title.Pick(record.TitleBn);
+    var abstractText = record.Abstract.PickOptional(record.AbstractBn);
+    var authors = record.Authors.OrderBy(a => a.DisplayOrder).ToList();
+    var doiUrl = string.IsNullOrWhiteSpace(record.Doi)
+        ? null
+        : record.Doi.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? record.Doi : $"https://doi.org/{record.Doi}";
+    var sections = new (string Label, string? Content)[]
+    {
+        (L["Introduction"].Value, record.Introduction),
+        (L["Methodology"].Value, record.Methodology),
+        (L["Tools"].Value, record.Tools),
+        (L["Datasets"].Value, record.Datasets),
+        (L["Experiments"].Value, record.Experiments),
+        (L["Findings"].Value, record.Findings),
+        (L["Discussion"].Value, record.Discussion),
+        (L["Limitations"].Value, record.Limitations),
+        (L["Conclusion"].Value, record.Conclusion),
+        (L["Future work"].Value, record.FutureWork)
+    }.Where(s => !string.IsNullOrWhiteSpace(s.Content)).ToList();
+}
+<article class="detail-page">
+    <div class="container">
+        <nav class="breadcrumb" aria-label="@L["Breadcrumb"]">
+            <a href="/">@L["Home"]</a>
+            <span aria-hidden="true">/</span>
+            <a href="/research">@L["Research"]</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">@title</span>
+        </nav>
+
+        <header class="detail-header research-detail-header">
+            <div class="detail-header-main">
+                @if (record.Category is not null)
+                {
+                    <p class="section-eyebrow">@record.Category.Name.Pick(record.Category.NameBn)</p>
+                }
+                <h1 class="page-title">@title</h1>
+                @if (authors.Count > 0)
+                {
+                    <p class="research-authors-lg">
+                        @string.Join(", ", authors.Select(a => a.Name))
+                    </p>
+                }
+                <ul class="detail-meta">
+                    @if (record.PublicationDate is not null)
+                    {
+                        <li><span class="meta-label">@L["Published"]</span>@record.PublicationDate.FormatDateFull()</li>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(record.Journal))
+                    {
+                        <li><span class="meta-label">@L["Journal"]</span>@record.Journal</li>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(record.PublicationVenue))
+                    {
+                        <li><span class="meta-label">@L["Venue"]</span>@record.PublicationVenue</li>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(record.Doi))
+                    {
+                        <li><span class="meta-label">DOI</span>@record.Doi</li>
+                    }
+                </ul>
+                <div class="page-actions">
+                    @if (record.PdfMediaId is not null)
+                    {
+                        <a class="btn btn-primary btn-sm" href="/media/@record.PdfMediaId?download=true">
+                            <partial name="_Icon" model="@("download")" />
+                            <span>@L["Download PDF"]</span>
+                        </a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(doiUrl))
+                    {
+                        <a class="btn btn-secondary btn-sm" href="@doiUrl" target="_blank" rel="noopener noreferrer">
+                            <partial name="_Icon" model="@("external-link")" />
+                            <span>@L["View publication"]</span>
+                        </a>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(record.ExternalUrl))
+                    {
+                        <a class="btn btn-secondary btn-sm" href="@record.ExternalUrl" target="_blank" rel="noopener noreferrer">
+                            <partial name="_Icon" model="@("external-link")" />
+                            <span>@L["View publication"]</span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </header>
+
+        <div class="detail-layout">
+            <div class="detail-content">
+                @if (!string.IsNullOrWhiteSpace(abstractText))
+                {
+                    <section class="abstract-panel" aria-labelledby="abstract-title">
+                        <h2 id="abstract-title">@L["Abstract"]</h2>
+                        <p>@abstractText</p>
+                    </section>
+                }
+
+                @foreach (var part in sections)
+                {
+                    <section class="detail-section">
+                        <h2>@part.Label</h2>
+                        <div class="prose">@Html.Raw(Markdown.ToHtml(part.Content))</div>
+                    </section>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(record.References))
+                {
+                    <section class="detail-section">
+                        <h2>@L["References"]</h2>
+                        <div class="prose prose-sm">@Html.Raw(Markdown.ToHtml(record.References))</div>
+                    </section>
+                }
+            </div>
+
+            <aside class="detail-sidebar">
+                @if (record.CoverImage is not null)
+                {
+                    <figure class="sidebar-card sidebar-image">
+                        <img src="/media/@record.CoverImage.Id" alt="@(record.CoverImage.AltText ?? title)" loading="lazy" width="480" height="360" />
+                    </figure>
+                }
+                <div class="sidebar-card">
+                    <h2>@L["Publication details"]</h2>
+                    <dl class="detail-list">
+                        <div><dt>@L["Status"]</dt><dd>@L["Published"]</dd></div>
+                        @if (record.StartDate is not null)
+                        {
+                            <div><dt>@L["Started"]</dt><dd>@record.StartDate.FormatDate()</dd></div>
+                        }
+                        @if (record.PublicationDate is not null)
+                        {
+                            <div><dt>@L["Published"]</dt><dd>@record.PublicationDate.FormatDate()</dd></div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(record.Keywords))
+                        {
+                            <div><dt>@L["Keywords"]</dt><dd>@record.Keywords</dd></div>
+                        }
+                    </dl>
+                </div>
+                @if (authors.Count > 0)
+                {
+                    <div class="sidebar-card">
+                        <h2>@L["Authors"]</h2>
+                        <ul class="author-list">
+                            @foreach (var author in authors)
+                            {
+                                <li>
+                                    <strong>@author.Name</strong>
+                                    @if (!string.IsNullOrWhiteSpace(author.Affiliation))
+                                    {
+                                        <span class="muted">@author.Affiliation</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(author.Role))
+                                    {
+                                        <span class="author-role">@author.Role</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                @if (record.Tags.Count > 0)
+                {
+                    <div class="sidebar-card">
+                        <h2>@L["Tags"]</h2>
+                        <ul class="chip-row">
+                            @foreach (var tag in record.Tags)
+                            {
+                                <li><a class="chip" href="/research?tag=@tag.Tag?.Slug">@tag.Tag?.Name</a></li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </aside>
+        </div>
+
+        @if (Model.Related.Count > 0)
+        {
+            <section class="related-section">
+                <div class="section-head">
+                    <h2 class="section-title">@L["Related research"]</h2>
+                    <a class="text-link" href="/research">@L["All research"] <partial name="_Icon" model="@("arrow-right")" /></a>
+                </div>
+                <div class="research-list">
+                    @foreach (var related in Model.Related)
+                    {
+                        <partial name="_ResearchCard" model="related" />
+                    }
+                </div>
+            </section>
+        }
+    </div>
+</article>

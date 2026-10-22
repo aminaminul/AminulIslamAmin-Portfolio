@@ -1,0 +1,72 @@
+@model ProjectsIndexViewModel
+@{
+    var baseRoute = new Dictionary<string, string?>();
+    if (!string.IsNullOrWhiteSpace(Model.Query)) baseRoute["q"] = Model.Query;
+}
+<section class="page-hero page-hero-sm">
+    <div class="container">
+        <p class="section-eyebrow">@L["Portfolio"]</p>
+        <h1 class="page-title">@L["Projects"]</h1>
+        <p class="page-lead">@L["A selection of work, side projects and experiments. Only published projects are listed."]</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="filter-bar">
+            <form class="search-form" method="get" action="/projects" role="search">
+                <label class="sr-only" for="project-search">@L["Search projects"]</label>
+                <div class="input-with-icon">
+                    <partial name="_Icon" model="@("search")" />
+                    <input id="project-search" type="search" name="q" value="@Model.Query" placeholder="@L["Search projects or technologies"]" />
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.Category))
+                {
+                    <input type="hidden" name="category" value="@Model.Category" />
+                }
+                <button class="btn btn-secondary btn-sm" type="submit">@L["Search"]</button>
+                @if (!string.IsNullOrWhiteSpace(Model.Query) || !string.IsNullOrWhiteSpace(Model.Category))
+                {
+                    <a class="btn btn-ghost btn-sm" href="/projects">@L["Clear filters"]</a>
+                }
+            </form>
+
+            @if (Model.Categories.Count > 0)
+            {
+                <nav class="filter-chips" aria-label="@L["Filter by category"]">
+                    <a class="chip @(string.IsNullOrWhiteSpace(Model.Category) ? "is-active" : null)"
+                       href="@Url.Action("Index", "Projects", new { q = Model.Query })">@L["All"]</a>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <a class="chip @(Model.Category == category ? "is-active" : null)"
+                           href="@Url.Action("Index", "Projects", new { q = Model.Query, category })">@category</a>
+                    }
+                </nav>
+            }
+        </div>
+
+        @if (Model.Projects.Items.Count == 0)
+        {
+            @if (!string.IsNullOrWhiteSpace(Model.Query) || !string.IsNullOrWhiteSpace(Model.Category))
+            {
+                <partial name="_Empty" model="@(new EmptyStateModel(L["No matching projects"].Value, L["Try a different search term or clear the filters."].Value, "search", "/projects", L["Clear filters"].Value))" />
+            }
+            else
+            {
+                <partial name="_Empty" model="@(new EmptyStateModel(L["Projects are coming soon"].Value, L["Published projects will appear here as soon as they are ready."].Value, "box"))" />
+            }
+        }
+        else
+        {
+            <p class="result-count">@Model.Projects.TotalCount @(Model.Projects.TotalCount == 1 ? L["project"].Value : L["projectsPlural"].Value)</p>
+            <div class="project-grid">
+                @foreach (var project in Model.Projects.Items)
+                {
+                    <partial name="_ProjectCard" model="project" />
+                }
+            </div>
+            <partial name="_Pager" model="@(new PagerModel(Model.Projects.Page, Model.Projects.TotalPages,
+                page => Url.Action("Index", "Projects", new { q = Model.Query, category = Model.Category, page })!))" />
+        }
+    </div>
+</section>

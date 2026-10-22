@@ -1,0 +1,101 @@
+@model ServicesViewModel
+@{
+    var name = Model.Profile.DisplayName(Model.Settings);
+}
+<section class="page-hero page-hero-sm">
+    <div class="container">
+        <p class="section-eyebrow">@L["Services"]</p>
+        <h1 class="page-title">@L["How I can help"]</h1>
+        <p class="page-lead">@L["Services offered by"] @name</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        @if (Model.Services.Count == 0)
+        {
+            <partial name="_Empty" model="@(new EmptyStateModel(L["No services listed yet"].Value, L["Services added in the admin panel will be listed here."].Value, "sparkles"))" />
+        }
+        else
+        {
+            <div class="service-grid service-grid-lg">
+                @foreach (var service in Model.Services)
+                {
+                    <article class="service-card" data-reveal>
+                        <span class="icon-badge" aria-hidden="true"><partial name="_Icon" model="@(service.IconName ?? "sparkles")" /></span>
+                        <h2>@service.Title.Pick(service.TitleBn)</h2>
+                        @if (!string.IsNullOrWhiteSpace(service.Description))
+                        {
+                            <p>@service.Description.Pick(service.DescriptionBn)</p>
+                        }
+                        @if (service.StartingPrice is not null)
+                        {
+                            <p class="price">
+                                <span class="muted">@L["From"]</span>
+                                @service.Currency @service.StartingPrice.Value.ToString("0.##", CultureInfo.CurrentCulture)
+                            </p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(service.CtaUrl) && !string.IsNullOrWhiteSpace(service.CtaLabel))
+                        {
+                            <a class="btn btn-secondary btn-sm" href="@service.CtaUrl">@service.CtaLabel</a>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@if (Model.Testimonials.Count > 0)
+{
+    <section class="section section-alt">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <p class="section-eyebrow">@L["Testimonials"]</p>
+                    <h2 class="section-title">@L["What collaborators say"]</h2>
+                </div>
+            </div>
+            <div class="testimonial-grid">
+                @foreach (var testimonial in Model.Testimonials)
+                {
+                    <figure class="testimonial-card">
+                        <blockquote>@testimonial.Quote.Pick(testimonial.QuoteBn)</blockquote>
+                        <figcaption>
+                            @if (testimonial.AvatarMediaId is not null)
+                            {
+                                <img class="avatar" src="/media/@testimonial.AvatarMediaId" alt="" loading="lazy" width="48" height="48" />
+                            }
+                            else
+                            {
+                                <span class="avatar avatar-fallback" aria-hidden="true">@(testimonial.ClientName.Length > 0 ? testimonial.ClientName[..1] : "?")</span>
+                            }
+                            <span>
+                                <strong>@testimonial.ClientName</strong>
+                                @if (!string.IsNullOrWhiteSpace(testimonial.ClientRole) || !string.IsNullOrWhiteSpace(testimonial.Organization))
+                                {
+                                    <span class="muted">@string.Join(", ", new[] { testimonial.ClientRole, testimonial.Organization }.Where(v => !string.IsNullOrWhiteSpace(v)))</span>
+                                }
+                            </span>
+                        </figcaption>
+                    </figure>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-panel">
+            <div>
+                <p class="section-eyebrow">@L["Contact"]</p>
+                <h2>@L["Tell me about your project"]</h2>
+                <p>@L["Share your goals and requirements, and I will reply with the next steps."]</p>
+            </div>
+            <div class="cta-actions">
+                <a class="btn btn-primary" href="/contact">@L["Get in touch"] <partial name="_Icon" model="@("arrow-right")" /></a>
+            </div>
+        </div>
+    </div>
+</section>

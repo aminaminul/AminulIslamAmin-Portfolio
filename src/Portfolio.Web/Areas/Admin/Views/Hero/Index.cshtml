@@ -1,0 +1,147 @@
+@model HeroFormModel
+@{
+    ViewData["Title"] = "Hero section";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Hero section</h1>
+        <p>The first screen visitors see. Every label, destination and visibility toggle here is saved to the database.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/" target="_blank" rel="noopener"><partial name="_Icon" model="@("eye")" /> Preview home</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Hero" asp-action="Index" enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Messaging</h2>
+        <p class="section-hint">Headline and subheadline override the profile title and introduction when provided.</p>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="BadgeText">Availability / badge text (English)</label>
+                <input asp-for="BadgeText" maxlength="80" placeholder="Open to new opportunities" />
+                <span class="field-error" asp-validation-for="BadgeText"></span>
+            </div>
+            <div class="field">
+                <label asp-for="BadgeTextBn">Availability / badge text (Bangla)</label>
+                <input asp-for="BadgeTextBn" maxlength="100" lang="bn" />
+                <span class="field-error" asp-validation-for="BadgeTextBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Headline">Hero headline (English)</label>
+                <input asp-for="Headline" maxlength="200" placeholder="Leave empty to use your professional title" />
+                <span class="field-error" asp-validation-for="Headline"></span>
+            </div>
+            <div class="field">
+                <label asp-for="HeadlineBn">Hero headline (Bangla)</label>
+                <input asp-for="HeadlineBn" maxlength="250" lang="bn" />
+                <span class="field-error" asp-validation-for="HeadlineBn"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Subheadline">Subheadline (English)</label>
+                <textarea asp-for="Subheadline" rows="3" maxlength="600"></textarea>
+                <span class="field-error" asp-validation-for="Subheadline"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="SubheadlineBn">Subheadline (Bangla)</label>
+                <textarea asp-for="SubheadlineBn" rows="3" maxlength="700" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="SubheadlineBn"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Call-to-action buttons</h2>
+        <p class="section-hint">Hidden buttons are not rendered at all. Destinations accept a site path such as /projects or a full https URL.</p>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="PrimaryCtaLabel">Primary label (English)</label>
+                <input asp-for="PrimaryCtaLabel" maxlength="60" />
+                <span class="field-error" asp-validation-for="PrimaryCtaLabel"></span>
+            </div>
+            <div class="field">
+                <label asp-for="PrimaryCtaLabelBn">Primary label (Bangla)</label>
+                <input asp-for="PrimaryCtaLabelBn" maxlength="80" lang="bn" />
+                <span class="field-error" asp-validation-for="PrimaryCtaLabelBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="PrimaryCtaUrl">Primary destination</label>
+                <input asp-for="PrimaryCtaUrl" maxlength="300" placeholder="/projects" />
+                <span class="field-error" asp-validation-for="PrimaryCtaUrl"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SecondaryCtaLabel">Secondary label (English)</label>
+                <input asp-for="SecondaryCtaLabel" maxlength="60" />
+                <span class="field-error" asp-validation-for="SecondaryCtaLabel"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SecondaryCtaLabelBn">Secondary label (Bangla)</label>
+                <input asp-for="SecondaryCtaLabelBn" maxlength="80" lang="bn" />
+                <span class="field-error" asp-validation-for="SecondaryCtaLabelBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SecondaryCtaUrl">Secondary destination</label>
+                <input asp-for="SecondaryCtaUrl" maxlength="300" placeholder="/contact" />
+                <span class="field-error" asp-validation-for="SecondaryCtaUrl"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Layout and visibility</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="ImagePosition">Image position</label>
+                <select asp-for="ImagePosition">
+                    <option value="right">Right</option>
+                    <option value="left">Left</option>
+                </select>
+                <span class="field-error" asp-validation-for="ImagePosition"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ShowPhoto">Photo</label>
+                <div class="check-card">
+                    <input asp-for="ShowPhoto" />
+                    <label for="ShowPhoto">Show the hero image or profile photo</label>
+                </div>
+            </div>
+            <div class="field">
+                <label asp-for="ShowPrimaryCta">Primary button</label>
+                <div class="check-card"><input asp-for="ShowPrimaryCta" /><label for="ShowPrimaryCta">Show primary call to action</label></div>
+            </div>
+            <div class="field">
+                <label asp-for="ShowSecondaryCta">Secondary button</label>
+                <div class="check-card"><input asp-for="ShowSecondaryCta" /><label for="ShowSecondaryCta">Show secondary call to action</label></div>
+            </div>
+            <div class="field">
+                <label asp-for="ShowResumeButton">Resume button</label>
+                <div class="check-card"><input asp-for="ShowResumeButton" /><label for="ShowResumeButton">Show the CV download button</label></div>
+                <span class="hint">Only appears when a CV file has been uploaded.</span>
+            </div>
+            <div class="field">
+                <label asp-for="ShowSocialLinks">Social links</label>
+                <div class="check-card"><input asp-for="ShowSocialLinks" /><label for="ShowSocialLinks">Show social profiles in the hero</label></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Hero image</h2>
+        <p class="section-hint">Optional. When empty, the profile photo is used. A monogram is shown if neither exists.</p>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("Image", "Hero image", Model.ImageMediaId,
+                ViewData["ImageChoices"] as IEnumerable<MediaFile> ?? [], "Portrait images around 4:5 work best."))" />
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">Save hero section</span>
+        </button>
+    </div>
+</form>

@@ -1,0 +1,40 @@
+@model AboutSection
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Preview · @Model.Title</title>
+    <script src="~/js/theme-init.js" asp-append-version="true"></script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="site-body">
+    <div class="preview-banner">
+        <strong>Preview</strong>
+        <span>@Model.Title</span>
+        <a class="text-link" href="/Admin/About/Edit/@Model.Id" style="margin-left:auto">Edit section</a>
+    </div>
+    <main class="section">
+        <div class="container">
+            <article class="about-block @(Model.Image is not null ? "has-media" : null)">
+                <div>
+                    <h1 class="page-title">@(ContentLocalization.IsBangla && Model.TitleBn is not null ? Model.TitleBn : Model.Title)</h1>
+                    <div class="prose">
+                        @Html.Raw(ViewData["BodyHtml"] as string)
+                    </div>
+                </div>
+                @if (Model.Image is not null)
+                {
+                    <figure class="about-block-media">
+                        <img src="/media/@Model.Image.Id" alt="@(Model.Image.AltText ?? Model.Title)" />
+                    </figure>
+                }
+            </article>
+        </div>
+    </main>
+</body>
+</html>

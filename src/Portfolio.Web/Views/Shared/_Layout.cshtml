@@ -1,0 +1,52 @@
+@inject ISiteChromeService Chrome
+@{
+    var chrome = await Chrome.GetAsync(Context.Request.Path);
+    var settings = chrome.Settings;
+    var seo = ViewData["Seo"] as SeoModel;
+    var isPreview = ViewData["IsPreview"] as bool? == true;
+    var lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var accent = string.IsNullOrWhiteSpace(settings.AccentColor) ? null : settings.AccentColor;
+}
+<!DOCTYPE html>
+<html lang="@lang" data-theme-preference="@settings.DefaultTheme" style="@(accent is null ? string.Empty : $"--accent: {accent}")">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <script src="~/js/theme-init.js" asp-append-version="true"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @{ ViewData["SiteName"] = settings.SiteName; }
+    @if (seo is not null)
+    {
+        <partial name="_Seo" model="seo" />
+    }
+    else
+    {
+        <title>@(settings.SeoTitle ?? settings.SiteName)</title>
+    }
+    <link rel="icon" href="~/images/favicon.svg" type="image/svg+xml" />
+    @await RenderSectionAsync("Head", required: false)
+</head>
+<body class="site-body">
+    <a class="skip-link" href="#main">@L["Skip to content"]</a>
+    <partial name="_Header" model="chrome" />
+    @if (isPreview)
+    {
+        <div class="preview-banner" role="status">
+            <span class="preview-dot" aria-hidden="true"></span>
+            <strong>@L["Preview"]</strong>
+            <span>@(ViewData["PreviewTitle"] as string)</span>
+            <span class="preview-note">@L["Only signed-in administrators can see this page."]</span>
+        </div>
+    }
+    <main id="main" tabindex="-1">
+        @RenderBody()
+    </main>
+    <partial name="_Footer" model="chrome" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

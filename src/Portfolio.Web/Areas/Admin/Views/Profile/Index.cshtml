@@ -1,0 +1,94 @@
+@model ProfileFormModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Profile</h1>
+        <p>Your name, title, introduction and photo. These details drive the header, hero section, footer and page metadata.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/" target="_blank" rel="noopener">
+            <partial name="_Icon" model="@("eye")" /> Preview home
+        </a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Profile" asp-action="Index" enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Identity</h2>
+        <p class="section-hint">Use the name you want visitors to see. The display name falls back to the full name.</p>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="FullName">Full name <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="FullName" required maxlength="160" autocomplete="name" />
+                <span class="field-error" asp-validation-for="FullName"></span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayName">Display name</label>
+                <input asp-for="DisplayName" maxlength="120" />
+                <span class="hint">Shown in navigation and headings. Leave empty to use the full name.</span>
+                <span class="field-error" asp-validation-for="DisplayName"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ProfessionalTitle">Professional title (English)</label>
+                <input asp-for="ProfessionalTitle" maxlength="160" placeholder="e.g. Backend Engineer" />
+                <span class="field-error" asp-validation-for="ProfessionalTitle"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ProfessionalTitleBn">Professional title (Bangla)</label>
+                <input asp-for="ProfessionalTitleBn" maxlength="200" lang="bn" />
+                <span class="field-error" asp-validation-for="ProfessionalTitleBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Location">Location</label>
+                <input asp-for="Location" maxlength="160" />
+                <span class="field-error" asp-validation-for="Location"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Introduction</h2>
+        <p class="section-hint">A short, specific summary of what you do and what you are looking for. Used in the hero and page descriptions.</p>
+        <div class="form-grid">
+            <div class="field span-2">
+                <label asp-for="ShortIntro">Short introduction (English)</label>
+                <textarea asp-for="ShortIntro" rows="4" maxlength="500"></textarea>
+                <span class="field-error" asp-validation-for="ShortIntro"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="ShortIntroBn">Short introduction (Bangla)</label>
+                <textarea asp-for="ShortIntroBn" rows="4" maxlength="600" lang="bn"></textarea>
+                <span class="hint">When a Bangla translation is missing, the English text is shown.</span>
+                <span class="field-error" asp-validation-for="ShortIntroBn"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Profile photo</h2>
+        <p class="section-hint">Square or portrait images work best. Files are validated and stored outside the public web root.</p>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("Photo", "Profile photo", Model.PhotoMediaId,
+                ViewData["PhotoChoices"] as IEnumerable<MediaFile> ?? [], "Replaces the photo in the hero and about pages."))" />
+            <div class="field">
+                <label asp-for="PhotoAlt">Alternative text</label>
+                <input asp-for="PhotoAlt" maxlength="250" />
+                <span class="hint">Describe the photo for screen-reader users. Defaults to your name.</span>
+                <span class="field-error" asp-validation-for="PhotoAlt"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">Save profile</span>
+        </button>
+    </div>
+</form>

@@ -1,0 +1,96 @@
+@model ChromeData
+@{
+    var settings = Model.Settings;
+    var displayName = Model.Profile.DisplayName(settings);
+    var brandText = string.IsNullOrWhiteSpace(settings.LogoText) ? displayName : settings.LogoText!;
+    var current = Model.CurrentPath?.TrimEnd('/') ?? string.Empty;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+    bool IsActive(string url)
+    {
+        var target = url.TrimEnd('/');
+        if (target.Length == 0) return current.Length == 0;
+        return current.Equals(target, StringComparison.OrdinalIgnoreCase);
+    }
+}
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" asp-area="" asp-controller="Home" asp-action="Index" aria-label="@brandText">
+            @if (settings.LogoMediaId is not null)
+            {
+                <img class="brand-logo" src="/media/@settings.LogoMediaId" alt="@brandText" width="40" height="40" />
+            }
+            else
+            {
+                <span class="brand-mark" aria-hidden="true">@(brandText.Length > 0 ? brandText[..1].ToUpper(CultureInfo.CurrentCulture) : "P")</span>
+            }
+            <span class="brand-text">
+                <span class="brand-name">@brandText</span>
+                @if (!string.IsNullOrWhiteSpace(settings.Tagline))
+                {
+                    <span class="brand-tagline">@settings.Tagline.Pick(settings.TaglineBn)</span>
+                }
+            </span>
+        </a>
+
+        <nav class="desktop-nav" aria-label="@L["Main navigation"]">
+            <ul class="nav-list">
+                @foreach (var item in Model.Navigation)
+                {
+                    <li>
+                        <a class="nav-link @(IsActive(item.Url) ? "is-active" : null)"
+                           href="@item.Url"
+                           target="@(item.OpenInNewTab ? "_blank" : null)"
+                           rel="@(item.OpenInNewTab ? "noopener noreferrer" : null)"
+                           aria-current="@(IsActive(item.Url) ? "page" : null)">@item.Label.Pick(item.LabelBn)</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <div class="lang-switch" role="group" aria-label="@L["Language"]">
+                <a class="lang-link @(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en" ? "is-active" : null)"
+                   href="/language/set?culture=en&returnUrl=@Uri.EscapeDataString(returnUrl)"
+                   aria-current="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en" ? "true" : null)" lang="en">EN</a>
+                <span aria-hidden="true">/</span>
+                <a class="lang-link @(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "bn" ? "is-active" : null)"
+                   href="/language/set?culture=bn&returnUrl=@Uri.EscapeDataString(returnUrl)"
+                   aria-current="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "bn" ? "true" : null)" lang="bn">বাংলা</a>
+            </div>
+
+            <button type="button" class="icon-button theme-toggle" data-theme-toggle aria-label="@L["Toggle theme"]" aria-pressed="false" title="@L["Toggle theme"]">
+                <partial name="_Icon" model="@("sun")" />
+                <partial name="_Icon" model="@("moon")" />
+            </button>
+
+            <a class="btn btn-primary btn-sm header-cta" href="/contact">
+                <partial name="_Icon" model="@("mail")" />
+                <span>@L["Get in touch"]</span>
+            </a>
+
+            <a class="icon-button admin-link" href="/Admin/Account/Login" aria-label="@L["Admin sign in"]" title="@L["Admin sign in"]">
+                <partial name="_Icon" model="@("lock")" />
+            </a>
+
+            <button type="button" class="icon-button menu-toggle" data-menu-toggle aria-expanded="false" aria-controls="mobile-nav" aria-label="@L["Menu"]">
+                <partial name="_Icon" model="@("menu")" />
+            </button>
+        </div>
+    </div>
+
+    <nav id="mobile-nav" class="mobile-nav" aria-label="@L["Mobile navigation"]" hidden>
+        <ul class="mobile-nav-list">
+            @foreach (var item in Model.Navigation)
+            {
+                <li>
+                    <a class="mobile-nav-link @(IsActive(item.Url) ? "is-active" : null)" href="@item.Url"
+                       aria-current="@(IsActive(item.Url) ? "page" : null)">@item.Label.Pick(item.LabelBn)</a>
+                </li>
+            }
+        </ul>
+        <div class="mobile-nav-footer">
+            <a class="btn btn-primary" href="/contact">@L["Get in touch"]</a>
+            <a class="muted-link" href="/Admin/Account/Login">@L["Admin sign in"]</a>
+        </div>
+    </nav>
+</header>

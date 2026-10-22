@@ -1,0 +1,56 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+publish/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.nupkg
+*.snupkg
+
+# IDE and tooling
+.vs/
+.vscode/
+.idea/
+.freebuff/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Runtime data: uploaded media, data-protection keys, SQLite test databases
+App_Data/
+**/App_Data/
+*.db
+*.db-shm
+*.db-wal
+
+# Local configuration and secrets (never commit real credentials)
+appsettings.Local.json
+appsettings.*.Local.json
+.env
+.env.*
+!.env.example
+secrets.json
+*.pfx
+*.publishSettings
+
+# Test and coverage output
+TestResults/
+coverage*.json
+coverage*.xml
+coverage*.info
+*.trx
+*.coverage
+*.coveragexml
+
+# Node artefacts (only present if a tool happens to create them)
+node_modules/
+npm-debug.log*
+
+# OS/temporary files
+*.tmp
+*.log

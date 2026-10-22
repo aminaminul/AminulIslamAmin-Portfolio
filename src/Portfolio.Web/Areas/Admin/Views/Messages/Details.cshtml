@@ -1,0 +1,88 @@
+@model ContactMessage
+@{
+    ViewData["Title"] = "Message";
+    ViewData["Section"] = "Overview";
+    var (emailLabel, emailClass) = Model.EmailState switch
+    {
+        EmailDeliveryState.Sent => ("Notification email sent", "badge-published"),
+        EmailDeliveryState.NotConfigured => ("Email delivery not configured — stored in inbox only", "badge-draft"),
+        EmailDeliveryState.Failed => ("Notification email failed", "badge-archived"),
+        _ => ("Notification not attempted", "badge-hidden")
+    };
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@(string.IsNullOrWhiteSpace(Model.Subject) ? "(no subject)" : Model.Subject)</h1>
+        <p>Received @Model.CreatedAt.ToLocalTime().ToString("dddd, d MMMM yyyy 'at' HH:mm")</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Messages"><partial name="_Icon" model="@("arrow-left")" /> Inbox</a>
+        <a class="btn btn-primary btn-sm" href="mailto:@Model.Email?subject=Re: @Uri.EscapeDataString(Model.Subject ?? "Your message")">
+            <partial name="_Icon" model="@("mail")" /> Reply by email
+        </a>
+    </div>
+</div>
+
+<div class="admin-grid admin-grid-2">
+    <div class="admin-card">
+        <div class="admin-card-head">
+            <div><h2>Message</h2></div>
+            <span class="badge @emailClass badge-plain">@emailLabel</span>
+        </div>
+        <div class="admin-card-body">
+            <dl class="message-meta">
+                <div><dt>Name</dt><dd>@Model.Name</dd></div>
+                <div><dt>Email</dt><dd><a href="mailto:@Model.Email">@Model.Email</a></dd></div>
+                <div><dt>Received</dt><dd>@Model.CreatedAt.ToLocalTime().ToString("d MMM yyyy, HH:mm")</dd></div>
+                <div><dt>Status</dt><dd>@(Model.IsArchived ? "Archived" : Model.IsRead ? "Read" : "Unread")</dd></div>
+            </dl>
+            <div class="message-body">@Model.Message</div>
+            @if (!string.IsNullOrWhiteSpace(Model.EmailError))
+            {
+                <div class="alert alert-warning" style="margin-top:1rem">
+                    <partial name="_Icon" model="@("alert-circle")" />
+                    <span>@Model.EmailError</span>
+                </div>
+            }
+        </div>
+        <div class="admin-card-footer">
+            <form method="post" asp-action="ToggleRead" asp-route-id="@Model.Id">
+                @Html.AntiForgeryToken()
+                <button class="btn btn-secondary btn-sm" type="submit">
+                    @(Model.IsRead ? "Mark as unread" : "Mark as read")
+                </button>
+            </form>
+            <form method="post" asp-action="ToggleArchive" asp-route-id="@Model.Id">
+                @Html.AntiForgeryToken()
+                <button class="btn btn-secondary btn-sm" type="submit">
+                    <partial name="_Icon" model="@("folder")" /> @(Model.IsArchived ? "Restore" : "Archive")
+                </button>
+            </form>
+            <form method="post" asp-action="Delete" asp-route-id="@Model.Id" data-confirm="Delete this message permanently?">
+                @Html.AntiForgeryToken()
+                <button class="btn btn-danger-ghost btn-sm" type="submit">
+                    <partial name="_Icon" model="@("trash")" /> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="admin-card-head">
+            <div><h2>Delivery</h2><p>How this submission was handled.</p></div>
+        </div>
+        <div class="admin-card-body">
+            <dl class="detail-list" style="font-size:0.85rem">
+                <div><dt>Saved to database</dt><dd>Yes</dd></div>
+                <div><dt>Email state</dt><dd>@Model.EmailState</dd></div>
+                @if (!string.IsNullOrWhiteSpace(Model.IpHash))
+                {
+                    <div><dt>Sender fingerprint</dt><dd style="word-break:break-all">@Model.IpHash</dd></div>
+                }
+            </dl>
+            <p class="hint" style="margin-top:1rem">
+                A stored message is not proof of email delivery. Configure an email provider on the server to receive notifications.
+            </p>
+        </div>
+    </div>
+</div>

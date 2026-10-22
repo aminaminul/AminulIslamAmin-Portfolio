@@ -1,0 +1,60 @@
+@model ResearchCategoryFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit research category" : "New research category";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>The slug is used in public filter URLs and must be unique.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Research/Categories"><partial name="_Icon" model="@("arrow-left")" /> Back</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Research" asp-action="@(isEdit ? "CategoryEdit" : "CategoryCreate")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Name">Name (English) <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Name" required maxlength="100" />
+                <span class="field-error" asp-validation-for="Name"></span>
+            </div>
+            <div class="field">
+                <label asp-for="NameBn">Name (Bangla)</label>
+                <input asp-for="NameBn" maxlength="120" lang="bn" />
+                <span class="field-error" asp-validation-for="NameBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Slug">Slug</label>
+                <input asp-for="Slug" maxlength="120" placeholder="generated-from-the-name" />
+                <span class="field-error" asp-validation-for="Slug"></span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+                <span class="field-error" asp-validation-for="DisplayOrder"></span>
+            </div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="IsVisible" />
+                <label for="IsVisible">Visible on the public website</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/Research/Categories">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save changes" : "Create category")</span>
+        </button>
+    </div>
+</form>

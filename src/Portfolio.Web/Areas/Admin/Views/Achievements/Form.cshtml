@@ -1,0 +1,84 @@
+@model AchievementFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit achievement" : "New achievement";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Dates and organisations are optional. Avoid claims that cannot be verified.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Achievements"><partial name="_Icon" model="@("arrow-left")" /> Back</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Achievements" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Title">Title (English) <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Title" required maxlength="200" />
+                <span class="field-error" asp-validation-for="Title"></span>
+            </div>
+            <div class="field">
+                <label asp-for="TitleBn">Title (Bangla)</label>
+                <input asp-for="TitleBn" maxlength="240" lang="bn" />
+                <span class="field-error" asp-validation-for="TitleBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="IssuingOrganization">Issuing organisation</label>
+                <input asp-for="IssuingOrganization" maxlength="200" />
+                <span class="field-error" asp-validation-for="IssuingOrganization"></span>
+            </div>
+            <div class="field">
+                <label asp-for="AchievementDate">Date</label>
+                <input asp-for="AchievementDate" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div class="field">
+                <label asp-for="ExternalUrl">External link</label>
+                <input asp-for="ExternalUrl" type="url" maxlength="600" />
+                <span class="field-error" asp-validation-for="ExternalUrl"></span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+            </div>
+            <div class="field span-2">
+                <label asp-for="Description">Description (English)</label>
+                <textarea asp-for="Description" rows="4"></textarea>
+            </div>
+            <div class="field span-2">
+                <label asp-for="DescriptionBn">Description (Bangla)</label>
+                <textarea asp-for="DescriptionBn" rows="3" lang="bn"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Supporting image</h2>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("Image", "Image", Model.ImageMediaId,
+                ViewData["ImageChoices"] as IEnumerable<MediaFile> ?? [], null))" />
+        </div>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="IsVisible" />
+                <label for="IsVisible">Visible on the public website</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/Achievements">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save changes" : "Create achievement")</span>
+        </button>
+    </div>
+</form>

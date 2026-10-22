@@ -1,0 +1,99 @@
+@model ChromeData
+@{
+    var settings = Model.Settings;
+    var name = Model.Profile.DisplayName(settings);
+    var year = DateTime.UtcNow.Year;
+    var footerLinks = Model.FooterNavigation.Count > 0 ? Model.FooterNavigation : Model.Navigation.Take(6).ToList();
+    var description = settings.FooterDescription.PickOptional(settings.FooterDescriptionBn) ?? settings.Tagline.PickOptional(settings.TaglineBn);
+}
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div class="footer-brand">
+            <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
+                @if (settings.LogoMediaId is not null)
+                {
+                    <img class="brand-logo" src="/media/@settings.LogoMediaId" alt="@name" width="40" height="40" />
+                }
+                else
+                {
+                    <span class="brand-mark" aria-hidden="true">@(name.Length > 0 ? name[..1].ToUpper(CultureInfo.CurrentCulture) : "P")</span>
+                }
+                <span class="brand-name">@name</span>
+            </a>
+            @if (!string.IsNullOrWhiteSpace(description))
+            {
+                <p class="footer-description">@description</p>
+            }
+            @if (settings.IsAvailable && !string.IsNullOrWhiteSpace(settings.AvailabilityText))
+            {
+                <p class="availability availability-sm"><span class="dot" aria-hidden="true"></span>@settings.AvailabilityText.Pick(settings.AvailabilityTextBn)</p>
+            }
+            @if (Model.SocialLinks.Count > 0)
+            {
+                <ul class="social-row" aria-label="@L["Social profiles"]">
+                    @foreach (var link in Model.SocialLinks)
+                    {
+                        <li>
+                            <a class="icon-link" href="@link.Url" target="_blank" rel="noopener noreferrer me" aria-label="@link.Platform">
+                                <partial name="_Icon" model="@(link.IconName ?? "globe")" />
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <nav class="footer-col" aria-label="@L["Footer navigation"]">
+            <h2>@L["Explore"]</h2>
+            <ul class="footer-links">
+                @foreach (var link in footerLinks)
+                {
+                    <li><a href="@link.Url">@link.Label.Pick(link.LabelBn)</a></li>
+                }
+            </ul>
+        </nav>
+
+        <div class="footer-col">
+            <h2>@L["Contact"]</h2>
+            <ul class="footer-links">
+                @if (!string.IsNullOrWhiteSpace(settings.ContactEmail))
+                {
+                    <li><a href="mailto:@settings.ContactEmail">@settings.ContactEmail</a></li>
+                }
+                @if (!string.IsNullOrWhiteSpace(settings.ContactPhone))
+                {
+                    <li><a href="tel:@settings.ContactPhone">@settings.ContactPhone</a></li>
+                }
+                @if (!string.IsNullOrWhiteSpace(settings.ContactLocation))
+                {
+                    <li>@settings.ContactLocation</li>
+                }
+                <li><a href="/contact">@L["Contact page"]</a></li>
+                @if (settings.ShowResumeSection && settings.ResumeMediaId is not null)
+                {
+                    <li><a href="/cv">@settings.ResumeButtonLabel.Pick(settings.ResumeButtonLabelBn)</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="container footer-bottom">
+        <p>
+            @if (!string.IsNullOrWhiteSpace(settings.CopyrightText))
+            {
+                @settings.CopyrightText
+            }
+            else
+            {
+                <text>© @year @name. @L["All rights reserved."]</text>
+            }
+        </p>
+        <p class="footer-meta">
+            <span>@L["Built with ASP.NET Core"]</span>
+            <a class="footer-admin" href="/Admin/Account/Login">
+                <partial name="_Icon" model="@("lock")" />
+                @L["Admin"]
+            </a>
+        </p>
+    </div>
+</footer>

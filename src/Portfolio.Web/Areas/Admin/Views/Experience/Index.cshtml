@@ -1,0 +1,114 @@
+@model AdminListViewModel<Experience>
+@{
+    ViewData["Title"] = "Experience";
+    ViewData["Section"] = "Portfolio";
+    var statuses = new[] { ("", "All"), ("published", "Published"), ("draft", "Drafts"), ("archived", "Archived") };
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Experience</h1>
+        <p>Your professional timeline. Only verified roles should be published; empty sections are hidden automatically.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-primary btn-sm" href="/Admin/Experience/Create"><partial name="_Icon" model="@("plus")" /> New role</a>
+    </div>
+</div>
+
+<div class="admin-toolbar">
+    <div class="filter-tabs" role="group" aria-label="Filter by status">
+        @foreach (var (value, label) in statuses)
+        {
+            <a class="filter-tab @(Model.Status == (string.IsNullOrEmpty(value) ? null : value) ? "is-active" : null)"
+               href="@Url.Action("Index", "Experience", new { q = Model.Q, status = string.IsNullOrEmpty(value) ? null : value })">@label</a>
+        }
+    </div>
+    <form class="admin-filters" method="get" action="/Admin/Experience" role="search">
+        <label class="sr-only" for="exp-q">Search experience</label>
+        <input id="exp-q" type="search" name="q" value="@Model.Q" placeholder="Search role or company" />
+        <input type="hidden" name="status" value="@Model.Status" />
+        <button class="btn btn-secondary" type="submit">Search</button>
+        @if (Model.HasFilters)
+        {
+            <a class="btn btn-ghost" href="/Admin/Experience">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="admin-card">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No experience records", "Add a role to build your professional timeline.", "briefcase", "/Admin/Experience/Create", "Add role"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:80px">Order</th>
+                        <th>Role</th>
+                        <th style="width:200px">Period</th>
+                        <th style="width:110px">Status</th>
+                        <th style="width:220px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up"><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down"><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@item.JobTitle</strong>
+                                    <span>@item.Company @(string.IsNullOrWhiteSpace(item.EmploymentType) ? "" : $"· {item.EmploymentType}") @(string.IsNullOrWhiteSpace(item.Location) ? "" : $"· {item.Location}")</span>
+                                </div>
+                            </td>
+                            <td class="cell-muted">@item.StartDate.FormatDateRange(item.EndDate, item.IsCurrent)</td>
+                            <td><partial name="_StatusBadge" model="item.Status" /></td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/Experience/Edit/@item.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    @if (item.Status == ContentStatus.Published)
+                                    {
+                                        <form method="post" asp-action="Unpublish" asp-route-id="@item.Id" data-confirm="Move this role to draft?">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Unpublish"><partial name="_Icon" model="@("eye")" /></button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-action="Publish" asp-route-id="@item.Id">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Publish"><partial name="_Icon" model="@("check")" /></button>
+                                        </form>
+                                    }
+                                    <form method="post" asp-action="Delete" asp-route-id="@item.Id" data-confirm="Delete this experience record?">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Pager is not null)
+        {
+            <div class="admin-card-footer"><partial name="_Pager" model="Model.Pager" /></div>
+        }
+    }
+</div>

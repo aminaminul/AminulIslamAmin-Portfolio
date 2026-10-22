@@ -1,0 +1,77 @@
+@model LoginViewModel
+@{
+    Layout = null;
+    var settingsName = "Portfolio";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin sign in · @settingsName</title>
+    <script src="~/js/theme-init.js" asp-append-version="true"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="icon" href="~/images/favicon.svg" type="image/svg+xml" />
+</head>
+<body class="admin-body">
+    <main class="login-page">
+        <div class="login-card">
+            <div class="login-brand">
+                <span class="brand-mark">P</span>
+                <span class="admin-brand-text">
+                    <strong>@settingsName</strong>
+                    <span>Administration</span>
+                </span>
+                <button type="button" class="icon-button theme-toggle" data-theme-toggle aria-label="Toggle theme" aria-pressed="false" style="margin-left:auto">
+                    <partial name="_Icon" model="@("sun")" />
+                    <partial name="_Icon" model="@("moon")" />
+                </button>
+            </div>
+
+            <h1>Sign in</h1>
+            <p class="login-lead">Administrator access only. Enter the credentials provisioned for this site.</p>
+
+            <form method="post" asp-area="Admin" asp-controller="Account" asp-action="Login">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert"></div>
+
+                <div class="field">
+                    <label asp-for="Email">Email address</label>
+                    <input asp-for="Email" type="email" autocomplete="username" required autofocus />
+                    <span class="field-error" asp-validation-for="Email"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Password">Password</label>
+                    <input asp-for="Password" type="password" autocomplete="current-password" required />
+                    <span class="field-error" asp-validation-for="Password"></span>
+                </div>
+
+                <div class="checkbox-field">
+                    <input asp-for="RememberMe" />
+                    <label asp-for="RememberMe">Keep me signed in on this device</label>
+                </div>
+
+                <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Signing in…" style="width:100%">
+                    <span class="btn-label">Sign in</span>
+                    <partial name="_Icon" model="@("arrow-right")" />
+                </button>
+            </form>
+
+            <p class="login-foot">
+                <span>Protected area</span>
+                <a href="/">Back to website</a>
+            </p>
+        </div>
+    </main>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+</body>
+</html>

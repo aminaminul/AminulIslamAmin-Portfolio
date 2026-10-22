@@ -1,0 +1,98 @@
+@model AdminListViewModel<Achievement>
+@{
+    ViewData["Title"] = "Achievements";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Achievements</h1>
+        <p>Awards and recognitions. The public section appears only when visible records exist.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-primary btn-sm" href="/Admin/Achievements/Create"><partial name="_Icon" model="@("plus")" /> New achievement</a>
+    </div>
+</div>
+
+<div class="admin-toolbar">
+    <form class="admin-filters" method="get" action="/Admin/Achievements" role="search">
+        <label class="sr-only" for="ach-q">Search achievements</label>
+        <input id="ach-q" type="search" name="q" value="@Model.Q" placeholder="Search title or organisation" />
+        <button class="btn btn-secondary" type="submit">Search</button>
+        @if (!string.IsNullOrWhiteSpace(Model.Q))
+        {
+            <a class="btn btn-ghost" href="/Admin/Achievements">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="admin-card">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No achievements", "Add an award or recognition to display it on the About page.", "star", "/Admin/Achievements/Create", "Add achievement"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:80px">Order</th>
+                        <th>Achievement</th>
+                        <th style="width:160px">Date</th>
+                        <th style="width:110px">Visibility</th>
+                        <th style="width:220px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up"><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down"><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@item.Title</strong>
+                                    <span>@(item.IssuingOrganization ?? "—")</span>
+                                </div>
+                            </td>
+                            <td class="cell-muted">@item.AchievementDate.FormatDate()</td>
+                            <td>
+                                @if (item.IsVisible) { <span class="badge badge-visible">Visible</span> }
+                                else { <span class="badge badge-hidden">Hidden</span> }
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/Achievements/Edit/@item.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    <form method="post" asp-action="ToggleVisible" asp-route-id="@item.Id">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="@(item.IsVisible ? "Hide" : "Show")"><partial name="_Icon" model="@("eye")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Delete" asp-route-id="@item.Id" data-confirm="Delete this achievement?">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Pager is not null)
+        {
+            <div class="admin-card-footer"><partial name="_Pager" model="Model.Pager" /></div>
+        }
+    }
+</div>

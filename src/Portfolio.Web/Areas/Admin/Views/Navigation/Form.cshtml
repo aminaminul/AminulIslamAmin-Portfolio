@@ -1,0 +1,69 @@
+@model NavigationFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit navigation link" : "New navigation link";
+    ViewData["Section"] = "Site";
+    var sections = new[] { ("", "None"), ("home", "Home"), ("about", "About"), ("skills", "Skills"), ("projects", "Projects"), ("research", "Research"), ("services", "Services"), ("contact", "Contact"), ("experience", "Experience"), ("education", "Education"), ("certifications", "Certifications"), ("achievements", "Achievements"), ("resume", "Resume") };
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Pick a destination used by the site, or enter any local path or https URL.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Navigation"><partial name="_Icon" model="@("arrow-left")" /> Back</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Navigation" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Label">Label (English) <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Label" required maxlength="80" />
+                <span class="field-error" asp-validation-for="Label"></span>
+            </div>
+            <div class="field">
+                <label asp-for="LabelBn">Label (Bangla)</label>
+                <input asp-for="LabelBn" maxlength="100" lang="bn" />
+                <span class="field-error" asp-validation-for="LabelBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Url">Destination <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Url" required maxlength="300" placeholder="/projects" />
+                <span class="field-error" asp-validation-for="Url"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SectionKey">Linked section</label>
+                <select asp-for="SectionKey">
+                    @foreach (var (value, label) in sections)
+                    {
+                        <option value="@value" selected="@(Model.SectionKey == (string.IsNullOrEmpty(value) ? null : value))">@label</option>
+                    }
+                </select>
+                <span class="hint">Documentation aid for the owner; does not change the destination.</span>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+            </div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card"><input asp-for="IsVisible" /><label for="IsVisible">Visible</label></div>
+            <div class="check-card"><input asp-for="ShowInFooter" /><label for="ShowInFooter">Show in footer instead of header</label></div>
+            <div class="check-card"><input asp-for="OpenInNewTab" /><label for="OpenInNewTab">Open in a new tab</label></div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/Navigation">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save changes" : "Add link")</span>
+        </button>
+    </div>
+</form>

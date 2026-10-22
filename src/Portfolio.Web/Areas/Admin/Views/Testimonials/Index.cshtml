@@ -1,0 +1,121 @@
+@model AdminListViewModel<Testimonial>
+@{
+    ViewData["Title"] = "Testimonials";
+    ViewData["Section"] = "Portfolio";
+    var statuses = new[] { ("", "All"), ("draft", "Awaiting approval"), ("published", "Published"), ("archived", "Archived") };
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Testimonials</h1>
+        <p>Moderate endorsements before they appear publicly. Only published testimonials are rendered.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-primary btn-sm" href="/Admin/Testimonials/Create"><partial name="_Icon" model="@("plus")" /> New testimonial</a>
+    </div>
+</div>
+
+<div class="admin-toolbar">
+    <div class="filter-tabs" role="group" aria-label="Filter by status">
+        @foreach (var (value, label) in statuses)
+        {
+            <a class="filter-tab @(Model.Status == (string.IsNullOrEmpty(value) ? null : value) ? "is-active" : null)"
+               href="@Url.Action("Index", "Testimonials", new { q = Model.Q, status = string.IsNullOrEmpty(value) ? null : value })">@label</a>
+        }
+    </div>
+    <form class="admin-filters" method="get" action="/Admin/Testimonials" role="search">
+        <label class="sr-only" for="testimonial-q">Search testimonials</label>
+        <input id="testimonial-q" type="search" name="q" value="@Model.Q" placeholder="Search client or text" />
+        <input type="hidden" name="status" value="@Model.Status" />
+        <button class="btn btn-secondary" type="submit">Search</button>
+        @if (Model.HasFilters)
+        {
+            <a class="btn btn-ghost" href="/Admin/Testimonials">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="admin-card">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No testimonials", "Add a testimonial only when you have the client's permission to publish it.", "user", "/Admin/Testimonials/Create", "Add testimonial"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:80px">Order</th>
+                        <th>Client</th>
+                        <th>Testimonial</th>
+                        <th style="width:150px">Status</th>
+                        <th style="width:240px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up"><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down"><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@item.ClientName</strong>
+                                    <span>@string.Join(", ", new[] { item.ClientRole, item.Organization }.Where(v => !string.IsNullOrWhiteSpace(v)))</span>
+                                </div>
+                            </td>
+                            <td class="cell-muted" style="max-width:340px">@(item.Quote.Length > 120 ? item.Quote[..120] + "…" : item.Quote)</td>
+                            <td><partial name="_StatusBadge" model="item.Status" /></td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/Testimonials/Edit/@item.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    @if (item.Status != ContentStatus.Published)
+                                    {
+                                        <form method="post" asp-action="Publish" asp-route-id="@item.Id">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Approve and publish"><partial name="_Icon" model="@("check")" /></button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-action="Unpublish" asp-route-id="@item.Id" data-confirm="Unpublish this testimonial?">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Unpublish"><partial name="_Icon" model="@("eye")" /></button>
+                                        </form>
+                                    }
+                                    @if (item.Status != ContentStatus.Archived)
+                                    {
+                                        <form method="post" asp-action="Archive" asp-route-id="@item.Id">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Archive"><partial name="_Icon" model="@("folder")" /></button>
+                                        </form>
+                                    }
+                                    <form method="post" asp-action="Delete" asp-route-id="@item.Id" data-confirm="Delete this testimonial permanently?">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Pager is not null)
+        {
+            <div class="admin-card-footer"><partial name="_Pager" model="Model.Pager" /></div>
+        }
+    }
+</div>

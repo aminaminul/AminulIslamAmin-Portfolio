@@ -1,0 +1,75 @@
+@model ResumeFormModel
+@{
+    ViewData["Title"] = "Resume / CV";
+    ViewData["Section"] = "Site";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Resume / CV</h1>
+        <p>Upload a PDF CV, control the download label and decide whether the resume section appears.</p>
+    </div>
+    <div class="admin-actions">
+        @if (Model.ResumeMediaId is not null)
+        {
+            <a class="btn btn-secondary btn-sm" href="/cv" target="_blank" rel="noopener">
+                <partial name="_Icon" model="@("download")" /> Test download
+            </a>
+        }
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Resume" asp-action="Index" enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>CV file</h2>
+        <p class="section-hint">PDF only, up to 20 MB. Stored in the persistent media folder configured for this deployment.</p>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("Resume", "Resume document", Model.ResumeMediaId,
+                ViewData["ResumeChoices"] as IEnumerable<MediaFile> ?? [], "Uploading a new PDF replaces the current CV.", true))" />
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Presentation</h2>
+        <div class="form-grid">
+            <div class="field span-2">
+                <label asp-for="ResumeHeadline">Resume headline (English)</label>
+                <input asp-for="ResumeHeadline" maxlength="400" />
+                <span class="field-error" asp-validation-for="ResumeHeadline"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="ResumeHeadlineBn">Resume headline (Bangla)</label>
+                <input asp-for="ResumeHeadlineBn" maxlength="400" lang="bn" />
+                <span class="field-error" asp-validation-for="ResumeHeadlineBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ResumeButtonLabel">Button label (English)</label>
+                <input asp-for="ResumeButtonLabel" maxlength="80" placeholder="Download CV" />
+                <span class="field-error" asp-validation-for="ResumeButtonLabel"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ResumeButtonLabelBn">Button label (Bangla)</label>
+                <input asp-for="ResumeButtonLabelBn" maxlength="80" lang="bn" />
+                <span class="field-error" asp-validation-for="ResumeButtonLabelBn"></span>
+            </div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="ShowResumeSection" />
+                <label for="ShowResumeSection">Show the resume section and download buttons</label>
+            </div>
+        </div>
+        <div class="form-note" style="margin-top:1rem">
+            The public download link exists only while a file is attached and the section is enabled.
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">Save resume settings</span>
+        </button>
+    </div>
+</form>

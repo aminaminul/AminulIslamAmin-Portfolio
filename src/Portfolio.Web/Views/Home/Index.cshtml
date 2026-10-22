@@ -1,0 +1,372 @@
+@model HomeViewModel
+@inject IMarkdownService Markdown
+@{
+    var profile = Model.Profile;
+    var hero = Model.Hero;
+    var settings = Model.Settings;
+    var displayName = profile.DisplayName(settings);
+    var role = profile.ProfessionalTitle.PickOptional(profile.ProfessionalTitleBn);
+    var headline = hero.Headline.PickOptional(hero.HeadlineBn);
+    var lead = hero.Subheadline.PickOptional(hero.SubheadlineBn) ?? profile.ShortIntro.PickOptional(profile.ShortIntroBn);
+    var photoId = hero.ShowPhoto ? (hero.ImageMediaId ?? profile.PhotoMediaId) : null;
+    var badge = hero.BadgeText.PickOptional(hero.BadgeTextBn)
+                ?? (settings.IsAvailable ? settings.AvailabilityText.PickOptional(settings.AvailabilityTextBn) : null);
+    var aboutSection = Model.AboutSections.FirstOrDefault();
+    var aboutImage = Model.AboutSections.Select(a => a.Image).FirstOrDefault(i => i is not null);
+    var hasProjects = Model.Projects.Count > 0;
+    var hasSkills = Model.SkillCategories.Count > 0;
+}
+<section class="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="container hero-grid @(hero.ImagePosition == "left" ? "is-reversed" : null)">
+        <div class="hero-copy">
+            @if (!string.IsNullOrWhiteSpace(badge))
+            {
+                <p class="availability" data-reveal>
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>@badge</span>
+                </p>
+            }
+            <h1 class="hero-title" data-reveal style="--delay: 60ms">
+                <span class="hero-name">@displayName</span>
+                @if (!string.IsNullOrWhiteSpace(headline))
+                {
+                    <span class="hero-role">@headline</span>
+                }
+                else if (!string.IsNullOrWhiteSpace(role))
+                {
+                    <span class="hero-role">@role</span>
+                }
+            </h1>
+            @if (!string.IsNullOrWhiteSpace(lead))
+            {
+                <p class="hero-lead" data-reveal style="--delay: 120ms">@lead</p>
+            }
+            else if (!string.IsNullOrWhiteSpace(settings.Tagline))
+            {
+                <p class="hero-lead" data-reveal style="--delay: 120ms">@settings.Tagline.Pick(settings.TaglineBn)</p>
+            }
+
+            <div class="hero-actions" data-reveal style="--delay: 180ms">
+                @if (hero.ShowPrimaryCta && !string.IsNullOrWhiteSpace(hero.PrimaryCtaLabel) && !string.IsNullOrWhiteSpace(hero.PrimaryCtaUrl))
+                {
+                    <a class="btn btn-primary" href="@hero.PrimaryCtaUrl">
+                        <span>@hero.PrimaryCtaLabel.Pick(hero.PrimaryCtaLabelBn)</span>
+                        <partial name="_Icon" model="@("arrow-right")" />
+                    </a>
+                }
+                @if (hero.ShowSecondaryCta && !string.IsNullOrWhiteSpace(hero.SecondaryCtaLabel) && !string.IsNullOrWhiteSpace(hero.SecondaryCtaUrl))
+                {
+                    <a class="btn btn-secondary" href="@hero.SecondaryCtaUrl">@hero.SecondaryCtaLabel.Pick(hero.SecondaryCtaLabelBn)</a>
+                }
+                @if (hero.ShowResumeButton && settings.ShowResumeSection && settings.ResumeMediaId is not null)
+                {
+                    <a class="btn btn-ghost" href="/cv">
+                        <partial name="_Icon" model="@("download")" />
+                        <span>@settings.ResumeButtonLabel.Pick(settings.ResumeButtonLabelBn)</span>
+                    </a>
+                }
+            </div>
+
+            @if (hero.ShowSocialLinks && Model.HeroSocialLinks.Count > 0)
+            {
+                <ul class="social-row hero-socials" aria-label="@L["Social profiles"]" data-reveal style="--delay: 240ms">
+                    @foreach (var link in Model.HeroSocialLinks)
+                    {
+                        <li>
+                            <a class="icon-link" href="@link.Url" target="_blank" rel="noopener noreferrer me" aria-label="@link.Platform">
+                                <partial name="_Icon" model="@(link.IconName ?? "globe")" />
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="hero-media" data-reveal style="--delay: 160ms">
+            <div class="portrait-frame">
+                <div class="portrait-inner">
+                    @if (photoId is not null)
+                    {
+                        <img class="portrait" src="/media/@photoId" alt="@(profile.PhotoAlt ?? displayName)" width="520" height="620" fetchpriority="high" />
+                    }
+                    else
+                    {
+                        <div class="portrait-placeholder" role="img" aria-label="@displayName">
+                            <span>@(displayName.Length > 0 ? displayName[..1].ToUpper(CultureInfo.CurrentCulture) : "P")</span>
+                        </div>
+                    }
+                </div>
+                @if (!string.IsNullOrWhiteSpace(profile.Location))
+                {
+                    <p class="portrait-note">
+                        <partial name="_Icon" model="@("map-pin")" />
+                        <span>@profile.Location</span>
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (aboutSection is not null)
+{
+    <section class="section" id="about">
+        <div class="container about-preview">
+            <div class="section-copy">
+                <p class="section-eyebrow">@L["About"]</p>
+                <h2 class="section-title">@aboutSection.Title.Pick(aboutSection.TitleBn)</h2>
+                <div class="prose">
+                    @Html.Raw(Markdown.ToHtml(ContentLocalization.IsBangla && aboutSection.BodyBn is not null ? aboutSection.BodyBn : aboutSection.Body))
+                </div>
+                <a class="btn btn-secondary btn-sm" href="/about">
+                    <span>@L["More about me"]</span>
+                    <partial name="_Icon" model="@("arrow-right")" />
+                </a>
+            </div>
+            @if (aboutImage is not null)
+            {
+                <figure class="about-media">
+                    <img src="/media/@aboutImage.Id" alt="@(aboutImage.AltText ?? aboutSection.Title)" loading="lazy" width="560" height="420" />
+                </figure>
+            }
+        </div>
+    </section>
+}
+
+<section class="section section-alt" id="skills">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <p class="section-eyebrow">@L["Skills"]</p>
+                <h2 class="section-title">@L["Skills & technologies"]</h2>
+            </div>
+            @if (hasSkills)
+            {
+                <a class="text-link" href="/skills">@L["Explore all skills"] <partial name="_Icon" model="@("arrow-right")" /></a>
+            }
+        </div>
+        @if (hasSkills)
+        {
+            <div class="skills-preview">
+                @foreach (var category in Model.SkillCategories.Take(3))
+                {
+                    <section class="skill-group" data-reveal>
+                        <h3>@category.Name.Pick(category.NameBn)</h3>
+                        <ul class="skill-list">
+                            @foreach (var skill in category.Skills.Take(8))
+                            {
+                                <li>
+                                    <span class="skill-icon" aria-hidden="true"><partial name="_Icon" model="@(skill.IconName ?? "code")" /></span>
+                                    <span class="skill-name">@skill.Name.Pick(skill.NameBn)</span>
+                                    @if (skill.Proficiency is not null)
+                                    {
+                                        <span class="skill-level">@skill.Proficiency%</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+            </div>
+        }
+        else
+        {
+            <partial name="_Empty" model="@(new EmptyStateModel(L["No skills listed yet"].Value, L["Skill categories and technologies added in the admin panel will appear here."].Value, "layers"))" />
+        }
+    </section>
+
+<section class="section" id="projects">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <p class="section-eyebrow">@L["Portfolio"]</p>
+                <h2 class="section-title">@L["Selected projects"]</h2>
+            </div>
+            @if (hasProjects)
+            {
+                <a class="text-link" href="/projects">@L["All projects"] <partial name="_Icon" model="@("arrow-right")" /></a>
+            }
+        </div>
+        @if (hasProjects)
+        {
+            <div class="project-grid">
+                @foreach (var project in Model.Projects.Take(6))
+                {
+                    <partial name="_ProjectCard" model="project" />
+                }
+            </div>
+        }
+        else
+        {
+            <partial name="_Empty" model="@(new EmptyStateModel(L["Projects are coming soon"].Value, L["Published projects will be listed here."].Value, "box"))" />
+        }
+    </div>
+</section>
+
+@if (Model.Experience.Count > 0)
+{
+    <section class="section section-alt" id="experience">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <p class="section-eyebrow">@L["Experience"]</p>
+                    <h2 class="section-title">@L["Where I have worked"]</h2>
+                </div>
+                <a class="text-link" href="/about#experience">@L["Full experience"] <partial name="_Icon" model="@("arrow-right")" /></a>
+            </div>
+            <ol class="timeline">
+                @foreach (var job in Model.Experience)
+                {
+                    <li class="timeline-item" data-reveal>
+                        <span class="timeline-dot" aria-hidden="true"></span>
+                        <div class="timeline-card">
+                            <div class="timeline-head">
+                                <div>
+                                    <h3>@job.JobTitle.Pick(job.JobTitleBn)</h3>
+                                    <p class="timeline-company">
+                                        @if (!string.IsNullOrWhiteSpace(job.CompanyUrl))
+                                        {
+                                            <a href="@job.CompanyUrl" target="_blank" rel="noopener noreferrer">@job.Company</a>
+                                        }
+                                        else
+                                        {
+                                            @job.Company
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(job.EmploymentType))
+                                        {
+                                            <span class="muted"> · @job.EmploymentType</span>
+                                        }
+                                    </p>
+                                </div>
+                                <p class="timeline-dates">@job.StartDate.FormatDateRange(job.EndDate, job.IsCurrent)</p>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(job.Responsibilities))
+                            {
+                                <div class="prose prose-sm">@Html.Raw(Markdown.ToHtml(job.Responsibilities))</div>
+                            }
+                        </div>
+                    </li>
+                }
+            </ol>
+        </div>
+    </section>
+}
+
+@if (Model.Research.Count > 0)
+{
+    <section class="section" id="research">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <p class="section-eyebrow">@L["Research"]</p>
+                    <h2 class="section-title">@L["Research & publications"]</h2>
+                </div>
+                <a class="text-link" href="/research">@L["All research"] <partial name="_Icon" model="@("arrow-right")" /></a>
+            </div>
+            <div class="research-list">
+                @foreach (var record in Model.Research)
+                {
+                    <partial name="_ResearchCard" model="record" />
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@if (Model.Services.Count > 0)
+{
+    <section class="section section-alt" id="services">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <p class="section-eyebrow">@L["Services"]</p>
+                    <h2 class="section-title">@L["How I can help"]</h2>
+                </div>
+                <a class="text-link" href="/services">@L["All services"] <partial name="_Icon" model="@("arrow-right")" /></a>
+            </div>
+            <div class="service-grid">
+                @foreach (var service in Model.Services)
+                {
+                    <article class="service-card" data-reveal>
+                        <span class="icon-badge" aria-hidden="true"><partial name="_Icon" model="@(service.IconName ?? "sparkles")" /></span>
+                        <h3>@service.Title.Pick(service.TitleBn)</h3>
+                        @if (!string.IsNullOrWhiteSpace(service.Description))
+                        {
+                            <p>@service.Description.Pick(service.DescriptionBn)</p>
+                        }
+                        @if (service.StartingPrice is not null)
+                        {
+                            <p class="price">
+                                <span class="muted">@L["From"]</span>
+                                @service.Currency @service.StartingPrice.Value.ToString("0.##", CultureInfo.CurrentCulture)
+                            </p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(service.CtaUrl) && !string.IsNullOrWhiteSpace(service.CtaLabel))
+                        {
+                            <a class="text-link" href="@service.CtaUrl">@service.CtaLabel <partial name="_Icon" model="@("arrow-up-right")" /></a>
+                        }
+                    </article>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@if (Model.Testimonials.Count > 0)
+{
+    <section class="section" id="testimonials">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <p class="section-eyebrow">@L["Testimonials"]</p>
+                    <h2 class="section-title">@L["What collaborators say"]</h2>
+                </div>
+            </div>
+            <div class="testimonial-grid">
+                @foreach (var testimonial in Model.Testimonials)
+                {
+                    <figure class="testimonial-card" data-reveal>
+                        <blockquote>@testimonial.Quote.Pick(testimonial.QuoteBn)</blockquote>
+                        <figcaption>
+                            @if (testimonial.AvatarMediaId is not null)
+                            {
+                                <img class="avatar" src="/media/@testimonial.AvatarMediaId" alt="" loading="lazy" width="48" height="48" />
+                            }
+                            else
+                            {
+                                <span class="avatar avatar-fallback" aria-hidden="true">@(testimonial.ClientName.Length > 0 ? testimonial.ClientName[..1] : "?")</span>
+                            }
+                            <span>
+                                <strong>@testimonial.ClientName</strong>
+                                @if (!string.IsNullOrWhiteSpace(testimonial.ClientRole) || !string.IsNullOrWhiteSpace(testimonial.Organization))
+                                {
+                                    <span class="muted">@string.Join(", ", new[] { testimonial.ClientRole, testimonial.Organization }.Where(v => !string.IsNullOrWhiteSpace(v)))</span>
+                                }
+                            </span>
+                        </figcaption>
+                    </figure>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-panel" data-reveal>
+            <div>
+                <p class="section-eyebrow">@L["Contact"]</p>
+                <h2>@L["Let's build something together"]</h2>
+                <p>@(settings.ContactIntro.PickOptional(settings.ContactIntroBn) ?? L["Have a project or a role in mind? Send a message and I will get back to you."].Value)</p>
+            </div>
+            <div class="cta-actions">
+                <a class="btn btn-primary" href="/contact">@L["Get in touch"] <partial name="_Icon" model="@("arrow-right")" /></a>
+                @if (!string.IsNullOrWhiteSpace(settings.ContactEmail))
+                {
+                    <a class="btn btn-secondary" href="mailto:@settings.ContactEmail">@settings.ContactEmail</a>
+                }
+            </div>
+        </div>
+    </div>
+</section>

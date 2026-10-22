@@ -1,0 +1,159 @@
+@inject ISiteSettingsService SettingsService
+@inject AppDbContext Db
+@{
+    var settings = await SettingsService.GetAsync(Context.RequestAborted);
+    var unread = await Db.ContactMessages.CountAsync(m => !m.IsRead && !m.IsArchived, Context.RequestAborted);
+    var profile = await Db.Profiles.AsNoTracking().FirstOrDefaultAsync(Context.RequestAborted);
+    var displayName = profile?.FullName is { Length: > 0 } ? profile.FullName : User.Identity?.Name ?? "Administrator";
+    var initial = displayName.Length > 0 ? displayName[..1].ToUpper(CultureInfo.CurrentCulture) : "A";
+    var path = (Context.Request.Path.Value ?? "/Admin").ToLowerInvariant();
+    var title = ViewData["Title"] as string ?? "Dashboard";
+    var crumbs = ViewData["Section"] as string;
+    bool IsActive(string prefix, bool exact = false) =>
+        exact ? path == prefix.ToLowerInvariant() : path.StartsWith(prefix.ToLowerInvariant(), StringComparison.Ordinal);
+}
+<!DOCTYPE html>
+<html lang="en" data-theme-preference="@settings.DefaultTheme">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>@title · @settings.SiteName admin</title>
+    <script src="~/js/theme-init.js" asp-append-version="true"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="icon" href="~/images/favicon.svg" type="image/svg+xml" />
+    @await RenderSectionAsync("Head", required: false)
+</head>
+<body class="admin-body">
+    <a class="skip-link" href="#admin-main">Skip to content</a>
+    <div class="admin-shell">
+        <aside class="admin-sidebar" id="admin-sidebar" aria-label="Admin navigation">
+            <div class="admin-sidebar-head">
+                <a class="admin-brand" href="/Admin">
+                    <span class="brand-mark">@(settings.SiteName.Length > 0 ? settings.SiteName[..1].ToUpper(CultureInfo.CurrentCulture) : "P")</span>
+                    <span class="admin-brand-text">
+                        <strong>@settings.SiteName</strong>
+                        <span>Content studio</span>
+                    </span>
+                </a>
+                <button type="button" class="icon-button admin-menu-button" data-sidebar-close aria-label="Close menu">
+                    <partial name="_Icon" model="@("x")" />
+                </button>
+            </div>
+
+            <nav class="admin-nav">
+                <div class="admin-nav-group">
+                    <h2>Overview</h2>
+                    <div class="admin-nav-list">
+                        <a class="admin-nav-link @(IsActive("/Admin", true) ? "is-active" : null)" href="/Admin">
+                            <partial name="_Icon" model="@("home")" /> Dashboard
+                        </a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Messages") ? "is-active" : null)" href="/Admin/Messages">
+                            <partial name="_Icon" model="@("mail")" /> Messages
+                            @if (unread > 0)
+                            {
+                                <span class="nav-count">@unread</span>
+                            }
+                        </a>
+                    </div>
+                </div>
+
+                <div class="admin-nav-group">
+                    <h2>Portfolio</h2>
+                    <div class="admin-nav-list">
+                        @{ var profileActive = IsActive("/Admin/Profile"); }
+                        <a class="admin-nav-link @(profileActive ? "is-active" : null)" href="/Admin/Profile"><partial name="_Icon" model="@("user")" /> Profile</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Hero") ? "is-active" : null)" href="/Admin/Hero"><partial name="_Icon" model="@("sparkles")" /> Hero section</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/About") ? "is-active" : null)" href="/Admin/About"><partial name="_Icon" model="@("book-open")" /> About me</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Skills") ? "is-active" : null)" href="/Admin/Skills"><partial name="_Icon" model="@("layers")" /> Skills</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Projects") ? "is-active" : null)" href="/Admin/Projects"><partial name="_Icon" model="@("box")" /> Projects</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Experience") ? "is-active" : null)" href="/Admin/Experience"><partial name="_Icon" model="@("briefcase")" /> Experience</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Education") ? "is-active" : null)" href="/Admin/Education"><partial name="_Icon" model="@("graduation-cap")" /> Education</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Research") ? "is-active" : null)" href="/Admin/Research"><partial name="_Icon" model="@("file-text")" /> Research</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Certifications") ? "is-active" : null)" href="/Admin/Certifications"><partial name="_Icon" model="@("award")" /> Certifications</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Achievements") ? "is-active" : null)" href="/Admin/Achievements"><partial name="_Icon" model="@("star")" /> Achievements</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Services") ? "is-active" : null)" href="/Admin/Services"><partial name="_Icon" model="@("wrench")" /> Services</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Testimonials") ? "is-active" : null)" href="/Admin/Testimonials"><partial name="_Icon" model="@("user")" /> Testimonials</a>
+                    </div>
+                </div>
+
+                <div class="admin-nav-group">
+                    <h2>Site</h2>
+                    <div class="admin-nav-list">
+                        <a class="admin-nav-link @(IsActive("/Admin/Resume") ? "is-active" : null)" href="/Admin/Resume"><partial name="_Icon" model="@("download")" /> Resume / CV</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Settings/Contact") ? "is-active" : null)" href="/Admin/Settings/Contact"><partial name="_Icon" model="@("phone")" /> Contact information</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/SocialLinks") ? "is-active" : null)" href="/Admin/SocialLinks"><partial name="_Icon" model="@("link")" /> Social links</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Navigation") ? "is-active" : null)" href="/Admin/Navigation"><partial name="_Icon" model="@("menu")" /> Navigation & footer</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Settings/Seo") ? "is-active" : null)" href="/Admin/Settings/Seo"><partial name="_Icon" model="@("globe")" /> SEO settings</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Settings/Footer") ? "is-active" : null)" href="/Admin/Settings/Footer"><partial name="_Icon" model="@("layout")" /> Footer</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Settings", true) ? "is-active" : null)" href="/Admin/Settings"><partial name="_Icon" model="@("settings")" /> Website settings</a>
+                        <a class="admin-nav-link @(IsActive("/Admin/Media") ? "is-active" : null)" href="/Admin/Media"><partial name="_Icon" model="@("image")" /> Media library</a>
+                    </div>
+                </div>
+
+                <div class="admin-nav-group">
+                    <h2>Account</h2>
+                    <div class="admin-nav-list">
+                        <a class="admin-nav-link @(IsActive("/Admin/Account/ChangePassword") ? "is-active" : null)" href="/Admin/Account/ChangePassword"><partial name="_Icon" model="@("shield")" /> Account & security</a>
+                        <a class="admin-nav-link" href="/" target="_blank" rel="noopener"><partial name="_Icon" model="@("external-link")" /> View website</a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="admin-sidebar-foot">
+                <div class="admin-user">
+                    <span class="brand-mark" style="width:30px;height:30px;font-size:0.75rem">@initial</span>
+                    <span>
+                        <strong>@displayName</strong>
+                        @User.Identity?.Name
+                    </span>
+                </div>
+                <form method="post" asp-area="Admin" asp-controller="Account" asp-action="Logout">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-secondary btn-sm" type="submit" style="width:100%;justify-content:flex-start">
+                        <partial name="_Icon" model="@("log-out")" /> Sign out
+                    </button>
+                </form>
+            </div>
+        </aside>
+        <div class="admin-overlay" data-sidebar-overlay hidden></div>
+
+        <div class="admin-main">
+            <header class="admin-topbar">
+                <div class="admin-topbar-left">
+                    <button type="button" class="icon-button admin-menu-button" data-sidebar-open aria-label="Open menu" aria-controls="admin-sidebar" aria-expanded="false">
+                        <partial name="_Icon" model="@("menu")" />
+                    </button>
+                    <div class="admin-topbar-title">
+                        <span>@(crumbs ?? "Admin")</span>
+                        <strong>@title</strong>
+                    </div>
+                </div>
+                <div class="admin-topbar-right">
+                    <button type="button" class="icon-button theme-toggle" data-theme-toggle aria-label="Toggle theme" title="Toggle theme" aria-pressed="false">
+                        <partial name="_Icon" model="@("sun")" />
+                        <partial name="_Icon" model="@("moon")" />
+                    </button>
+                    <a class="icon-button" href="/" target="_blank" rel="noopener" aria-label="View website" title="View website">
+                        <partial name="_Icon" model="@("external-link")" />
+                    </a>
+                </div>
+            </header>
+
+            <div id="admin-main" class="admin-content">
+                <partial name="_AdminToasts" />
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

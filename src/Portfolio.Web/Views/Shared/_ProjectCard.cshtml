@@ -1,0 +1,64 @@
+@model Project
+@{
+    var title = Model.Title.Pick(Model.TitleBn);
+    var summary = Model.Summary.PickOptional(Model.SummaryBn);
+    var stage = Model.Stage switch
+    {
+        ProjectStage.Planned => L["Planned"].Value,
+        ProjectStage.InProgress => L["In progress"].Value,
+        ProjectStage.Completed => L["Completed"].Value,
+        ProjectStage.Maintained => L["Maintained"].Value,
+        _ => L["Archived"].Value
+    };
+}
+<article class="project-card" data-reveal>
+    <a class="project-cover" href="/projects/@Model.Slug" tabindex="-1" aria-hidden="true">
+        @if (Model.CoverImage is not null)
+        {
+            <img src="/media/@Model.CoverImage.Id" alt="" loading="lazy" width="640" height="400" />
+        }
+        else
+        {
+            <span class="cover-placeholder">
+                <partial name="_Icon" model="@("box")" />
+            </span>
+        }
+        <span class="stage-badge stage-@Model.Stage.ToString().ToLowerInvariant()">@stage</span>
+    </a>
+    <div class="project-body">
+        <div class="card-meta">
+            @if (!string.IsNullOrWhiteSpace(Model.Category))
+            {
+                <span class="eyebrow">@Model.Category</span>
+            }
+            @if (Model.EndDate is not null)
+            {
+                <span class="meta-year">@Model.EndDate.Value.Year</span>
+            }
+            else if (Model.StartDate is not null)
+            {
+                <span class="meta-year">@Model.StartDate.Value.Year</span>
+            }
+        </div>
+        <h3 class="card-title">
+            <a href="/projects/@Model.Slug">@title</a>
+        </h3>
+        @if (!string.IsNullOrWhiteSpace(summary))
+        {
+            <p class="card-text">@summary</p>
+        }
+        @if (Model.Technologies.Count > 0)
+        {
+            <ul class="chip-row" aria-label="@L["Technologies"]">
+                @foreach (var tech in Model.Technologies.Take(4))
+                {
+                    <li class="chip">@tech.Technology?.Name</li>
+                }
+                @if (Model.Technologies.Count > 4)
+                {
+                    <li class="chip chip-muted">+@(Model.Technologies.Count - 4)</li>
+                }
+            </ul>
+        }
+    </div>
+</article>

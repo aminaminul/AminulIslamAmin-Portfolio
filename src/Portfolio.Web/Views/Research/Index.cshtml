@@ -1,0 +1,83 @@
+@model ResearchIndexViewModel
+<section class="page-hero page-hero-sm">
+    <div class="container">
+        <p class="section-eyebrow">@L["Research"]</p>
+        <h1 class="page-title">@L["Research & publications"]</h1>
+        <p class="page-lead">@L["Published research, methods and findings. Drafts and archived work are not listed."]</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <form class="filter-bar filter-bar-stacked" method="get" action="/research" role="search">
+            <div class="search-form">
+                <label class="sr-only" for="research-search">@L["Search research"]</label>
+                <div class="input-with-icon">
+                    <partial name="_Icon" model="@("search")" />
+                    <input id="research-search" type="search" name="q" value="@Model.Query" placeholder="@L["Search titles, abstracts and keywords"]" />
+                </div>
+            </div>
+            <div class="filter-selects">
+                <div class="field-inline">
+                    <label for="research-category">@L["Category"]</label>
+                    <select id="research-category" name="category">
+                        <option value="">@L["All categories"]</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.Slug" selected="@(Model.Category == category.Slug)">@category.Name.Pick(category.NameBn)</option>
+                        }
+                    </select>
+                </div>
+                @if (Model.Years.Count > 0)
+                {
+                    <div class="field-inline">
+                        <label for="research-year">@L["Year"]</label>
+                        <select id="research-year" name="year">
+                            <option value="">@L["All years"]</option>
+                            @foreach (var year in Model.Years)
+                            {
+                                <option value="@year" selected="@(Model.Year == year)">@year</option>
+                            }
+                        </select>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Tag))
+                {
+                    <input type="hidden" name="tag" value="@Model.Tag" />
+                }
+                <div class="filter-actions">
+                    <button class="btn btn-primary btn-sm" type="submit">@L["Apply filters"]</button>
+                    @if (!string.IsNullOrWhiteSpace(Model.Query) || !string.IsNullOrWhiteSpace(Model.Category) || Model.Year is not null || !string.IsNullOrWhiteSpace(Model.Tag))
+                    {
+                        <a class="btn btn-ghost btn-sm" href="/research">@L["Clear filters"]</a>
+                    }
+                </div>
+            </div>
+        </form>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Tag))
+        {
+            <p class="active-filter">
+                @L["Filtered by tag"]: <span class="chip is-active">@Model.Tag</span>
+                <a class="text-link" href="/research">@L["Remove"]</a>
+            </p>
+        }
+
+        @if (Model.Records.Items.Count == 0)
+        {
+            <partial name="_Empty" model="@(new EmptyStateModel(L["No research found"].Value, L["Published research matching these filters will appear here."].Value, "book-open"))" />
+        }
+        else
+        {
+            <p class="result-count">@Model.Records.TotalCount @(Model.Records.TotalCount == 1 ? L["publication"].Value : L["publications"].Value)</p>
+            <div class="research-list">
+                @foreach (var record in Model.Records.Items)
+                {
+                    <partial name="_ResearchCard" model="record" />
+                }
+            </div>
+            <partial name="_Pager" model="@(new PagerModel(Model.Records.Page, Model.Records.TotalPages,
+                page => Url.Action("Index", "Research", new { q = Model.Query, category = Model.Category, tag = Model.Tag, year = Model.Year, page })!))" />
+        }
+    </div>
+</section>

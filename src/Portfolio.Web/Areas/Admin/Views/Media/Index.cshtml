@@ -1,0 +1,112 @@
+@model AdminListViewModel<MediaFile>
+@{
+    ViewData["Title"] = "Media library";
+    ViewData["Section"] = "Site";
+    var kind = ViewData["Kind"] as string;
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Media library</h1>
+        <p>Images and documents are validated, stored outside the web root and served through a controlled endpoint.</p>
+    </div>
+</div>
+
+<section class="admin-card" style="margin-bottom:1.25rem">
+    <div class="admin-card-head">
+        <div>
+            <h2>Upload</h2>
+            <p>Images: JPEG, PNG, WebP, GIF up to 8 MB. Documents: PDF up to 20 MB.</p>
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <form method="post" asp-action="Upload" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="media-upload">
+                <div class="field">
+                    <label for="File">File</label>
+                    <input id="File" name="File" type="file" required />
+                </div>
+                <div class="field">
+                    <label for="Kind">Kind</label>
+                    <select id="Kind" name="Kind">
+                        <option value="0">Image</option>
+                        <option value="1">Document (PDF)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="AltText">Alt text</label>
+                    <input id="AltText" name="AltText" maxlength="250" placeholder="Describe the image for screen readers" />
+                </div>
+                <button class="btn btn-primary btn-sm" type="submit" data-submit-once data-loading-label="Uploading…">
+                    <partial name="_Icon" model="@("upload")" /><span class="btn-label">Upload</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<div class="admin-toolbar">
+    <div class="filter-tabs" role="group" aria-label="Filter media">
+        <a class="filter-tab @(string.IsNullOrEmpty(kind) ? "is-active" : null)" href="/Admin/Media">All</a>
+        <a class="filter-tab @(kind == "images" ? "is-active" : null)" href="/Admin/Media?kind=images">Images</a>
+        <a class="filter-tab @(kind == "documents" ? "is-active" : null)" href="/Admin/Media?kind=documents">Documents</a>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body">
+        @if (Model.Items.Count == 0)
+        {
+            <partial name="_Empty" model="@(new EmptyStateModel("No media found", "Upload an image or PDF to use in your content.", "image"))" />
+        }
+        else
+        {
+            <div class="media-grid">
+                @foreach (var file in Model.Items)
+                {
+                    <div class="media-tile">
+                        <div class="media-thumb">
+                            @if (file.Kind == MediaKind.Image)
+                            {
+                                <img src="/media/@file.Id" alt="@(file.AltText ?? file.OriginalName)" loading="lazy" />
+                            }
+                            else
+                            {
+                                <span class="doc-icon">
+                                    <partial name="_Icon" model="@("file-text")" />
+                                    @file.Extension.TrimStart('.').ToUpperInvariant()
+                                </span>
+                            }
+                        </div>
+                        <div class="media-info">
+                            <strong title="@file.OriginalName">@file.OriginalName</strong>
+                            <span>@((file.SizeBytes / 1024.0).ToString("0.#")) KB · @file.CreatedAt.ToLocalTime().ToString("d MMM yyyy")</span>
+                            <span>@(string.IsNullOrWhiteSpace(file.AltText) ? "No alt text" : file.AltText)</span>
+                        </div>
+                        <div class="media-actions">
+                            <a class="icon-action" href="/media/@file.Id" target="_blank" rel="noopener" aria-label="Open file"><partial name="_Icon" model="@("external-link")" /></a>
+                            <button class="icon-action" type="button" data-copy="/media/@file.Id" aria-label="Copy URL"><partial name="_Icon" model="@("link")" /></button>
+                            <form method="post" asp-action="Delete" asp-route-id="@file.Id"
+                                  data-confirm="Delete this file permanently? Files still used by content cannot be deleted.">
+                                @Html.AntiForgeryToken()
+                                <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                            </form>
+                        </div>
+                        <form method="post" asp-action="UpdateAlt" asp-route-id="@file.Id" class="admin-filters" style="padding:0 0.75rem 0.75rem">
+                            @Html.AntiForgeryToken()
+                            <label class="sr-only" for="alt-@file.Id">Alt text</label>
+                            <input id="alt-@file.Id" type="text" name="altText" value="@file.AltText" placeholder="Alt text" maxlength="250" style="min-width:0;flex:1" />
+                            <button class="icon-action" type="submit" aria-label="Save alt text"><partial name="_Icon" model="@("check")" /></button>
+                        </form>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    @if (Model.Pager is not null && Model.Pager.TotalPages > 1)
+    {
+        <div class="admin-card-footer">
+            <partial name="_Pager" model="Model.Pager" />
+        </div>
+    }
+</div>

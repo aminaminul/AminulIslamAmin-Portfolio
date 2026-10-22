@@ -1,0 +1,157 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["Section"] = "Overview";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Welcome back</h1>
+        <p>Everything visitors see is managed from this panel. Changes are saved to SQL Server and published content appears on the public website immediately.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/" target="_blank" rel="noopener">
+            <partial name="_Icon" model="@("external-link")" /> View website
+        </a>
+        <a class="btn btn-primary btn-sm" href="/Admin/Projects/Create">
+            <partial name="_Icon" model="@("plus")" /> New project
+        </a>
+    </div>
+</div>
+
+@if (Model.ProfileIncomplete)
+{
+    <div class="setup-note">
+        <div>
+            <strong>Finish your profile to bring the site to life</strong>
+            <p>Add your name, professional title, photo and introduction. These values appear in the header, hero and footer.</p>
+        </div>
+        <a class="btn btn-primary btn-sm" href="/Admin/Profile">Complete profile</a>
+    </div>
+}
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-label">Published projects</span>
+        <span class="stat-value">@Model.PublishedProjects</span>
+        <span class="stat-hint">@Model.DraftProjects draft · @Model.TotalProjects total</span>
+        <span class="stat-icon"><partial name="_Icon" model="@("box")" /></span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Published research</span>
+        <span class="stat-value">@Model.PublishedResearch</span>
+        <span class="stat-hint">@Model.DraftResearch draft · @Model.TotalResearch total</span>
+        <span class="stat-icon"><partial name="_Icon" model="@("file-text")" /></span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Unread messages</span>
+        <span class="stat-value">@Model.UnreadMessages</span>
+        <span class="stat-hint">@Model.TotalMessages saved in total</span>
+        <span class="stat-icon"><partial name="_Icon" model="@("mail")" /></span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Testimonials</span>
+        <span class="stat-value">@Model.PublishedTestimonials</span>
+        <span class="stat-hint">@Model.PendingTestimonials awaiting approval</span>
+        <span class="stat-icon"><partial name="_Icon" model="@("user")" /></span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Skills</span>
+        <span class="stat-value">@Model.TotalSkills</span>
+        <span class="stat-hint">Across all categories</span>
+        <span class="stat-icon"><partial name="_Icon" model="@("layers")" /></span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Certifications</span>
+        <span class="stat-value">@Model.TotalCertifications</span>
+        <span class="stat-hint">@Model.TotalExperience experience · @Model.TotalEducation education</span>
+        <span class="stat-icon"><partial name="_Icon" model="@("award")" /></span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Media files</span>
+        <span class="stat-value">@Model.MediaFiles</span>
+        <span class="stat-hint">Stored outside the web root</span>
+        <span class="stat-icon"><partial name="_Icon" model="@("image")" /></span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">About sections</span>
+        <span class="stat-value">@Model.PublishedAboutSections</span>
+        <span class="stat-hint">Published and visible</span>
+        <span class="stat-icon"><partial name="_Icon" model="@("book-open")" /></span>
+    </div>
+</div>
+
+<div class="admin-grid admin-grid-2">
+    <div class="admin-card">
+        <div class="admin-card-head">
+            <div>
+                <h2>Recent activity</h2>
+                <p>Latest content changes and messages from the database.</p>
+            </div>
+        </div>
+        @if (Model.Recent.Count == 0)
+        {
+            <div class="admin-card-body">
+                <partial name="_Empty" model="@(new EmptyStateModel("Nothing yet", "Create your first project or research record to see it here.", "clock"))" />
+            </div>
+        }
+        else
+        {
+            <div class="recent-list">
+                @foreach (var item in Model.Recent)
+                {
+                    <a class="recent-item" href="@item.AdminPath">
+                        <span class="recent-icon"><partial name="_Icon" model="@(item.Type == "Project" ? "box" : item.Type == "Research" ? "file-text" : "mail")" /></span>
+                        <span class="recent-main">
+                            <strong>@item.Title</strong>
+                            <span>@item.Type · @item.When.ToLocalTime().ToString("d MMM yyyy, HH:mm")</span>
+                        </span>
+                        <partial name="_Icon" model="@("chevron-right")" />
+                    </a>
+                }
+            </div>
+        }
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1.25rem">
+        <div class="admin-card">
+            <div class="admin-card-head">
+                <div>
+                    <h2>Common actions</h2>
+                    <p>Jump straight to the content you update most.</p>
+                </div>
+            </div>
+            <div class="admin-card-body">
+                <div class="quick-actions">
+                    <a class="quick-action" href="/Admin/Profile"><partial name="_Icon" model="@("user")" /> Edit profile</a>
+                    <a class="quick-action" href="/Admin/Hero"><partial name="_Icon" model="@("sparkles")" /> Hero section</a>
+                    <a class="quick-action" href="/Admin/Research/Create"><partial name="_Icon" model="@("file-text")" /> New research</a>
+                    <a class="quick-action" href="/Admin/Skills"><partial name="_Icon" model="@("layers")" /> Update skills</a>
+                    <a class="quick-action" href="/Admin/Resume"><partial name="_Icon" model="@("download")" /> Replace CV</a>
+                    <a class="quick-action" href="/Admin/Media"><partial name="_Icon" model="@("upload")" /> Upload media</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-card-head">
+                <div>
+                    <h2>Site status</h2>
+                    <p>Current configuration snapshot.</p>
+                </div>
+            </div>
+            <div class="admin-card-body">
+                <dl class="detail-list" style="font-size:0.85rem">
+                    <div><dt>Site name</dt><dd>@Model.Settings.SiteName</dd></div>
+                    <div><dt>Availability</dt><dd>@(Model.Settings.IsAvailable ? "Visible" : "Hidden")</dd></div>
+                    <div><dt>Contact form</dt><dd>@(Model.Settings.ShowContactForm ? "Open" : "Closed")</dd></div>
+                    <div><dt>Resume</dt><dd>@(Model.Settings.ResumeMediaId is null ? "No file uploaded" : "File attached")</dd></div>
+                    <div><dt>Services</dt><dd>@Model.TotalServices</dd></div>
+                </dl>
+                <div class="admin-actions" style="margin-top:1rem">
+                    <a class="btn btn-secondary btn-sm" href="/Admin/Settings">Website settings</a>
+                    <a class="btn btn-ghost btn-sm" href="/sitemap.xml" target="_blank" rel="noopener">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

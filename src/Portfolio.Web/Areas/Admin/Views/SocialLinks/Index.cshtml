@@ -1,0 +1,86 @@
+@model IReadOnlyList<SocialLink>
+@{
+    ViewData["Title"] = "Social links";
+    ViewData["Section"] = "Site";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Social links</h1>
+        <p>Validated external profiles shown in the hero and footer. Hidden links are never rendered.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-primary btn-sm" href="/Admin/SocialLinks/Create"><partial name="_Icon" model="@("plus")" /> Add link</a>
+    </div>
+</div>
+
+<div class="admin-card">
+    @if (Model.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No social links", "Add GitHub, LinkedIn or other profiles you want visitors to find.", "link", "/Admin/SocialLinks/Create", "Add link"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:80px">Order</th>
+                        <th style="width:160px">Platform</th>
+                        <th>URL</th>
+                        <th style="width:170px">Placement</th>
+                        <th style="width:110px">Status</th>
+                        <th style="width:220px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up"><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down"><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title" style="flex-direction:row;align-items:center;gap:0.5rem">
+                                    <span class="skill-icon" aria-hidden="true"><partial name="_Icon" model="@(item.IconName ?? "globe")" /></span>
+                                    <strong>@item.Platform</strong>
+                                </div>
+                            </td>
+                            <td class="cell-muted" style="word-break:break-all;max-width:320px">@item.Url</td>
+                            <td class="cell-muted">
+                                @(item.ShowInHero ? "Hero" : "")@(item.ShowInHero && item.ShowInFooter ? " · " : "")@(item.ShowInFooter ? "Footer" : "")
+                            </td>
+                            <td>
+                                @if (item.IsVisible) { <span class="badge badge-visible">Visible</span> }
+                                else { <span class="badge badge-hidden">Hidden</span> }
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/SocialLinks/Edit/@item.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    <form method="post" asp-action="ToggleVisible" asp-route-id="@item.Id">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="@(item.IsVisible ? "Hide" : "Show")"><partial name="_Icon" model="@("eye")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Delete" asp-route-id="@item.Id" data-confirm="Delete this social link?">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

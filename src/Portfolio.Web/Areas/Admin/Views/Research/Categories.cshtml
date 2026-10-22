@@ -1,0 +1,86 @@
+﻿@model IReadOnlyList<ResearchCategory>
+@{
+    ViewData["Title"] = "Research categories";
+    ViewData["Section"] = "Portfolio";
+    var usage = ViewData["Usage"] as Dictionary<int, int> ?? [];
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Research categories</h1>
+        <p>Categories filter the public research listing. A category can only be deleted when no records use it.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Research"><partial name="_Icon" model="@("arrow-left")" /> Research</a>
+        <a class="btn btn-primary btn-sm" href="/Admin/Research/CategoryCreate"><partial name="_Icon" model="@("plus")" /> New category</a>
+    </div>
+</div>
+
+<div class="admin-card">
+    @if (Model.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No categories yet", "Create categories to organise published research.", "layers", "/Admin/Research/CategoryCreate", "Create category"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:90px">Order</th>
+                        <th>Category</th>
+                        <th>Slug</th>
+                        <th style="width:100px">Records</th>
+                        <th style="width:110px">Visibility</th>
+                        <th style="width:200px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="CategoryMove" asp-route-id="@category.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up" @(category == Model.First() ? "disabled" : null)><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="CategoryMove" asp-route-id="@category.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down" @(category == Model.Last() ? "disabled" : null)><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@category.Name</strong>
+                                    @if (!string.IsNullOrWhiteSpace(category.NameBn))
+                                    {
+                                        <span lang="bn">@category.NameBn</span>
+                                    }
+                                </div>
+                            </td>
+                            <td class="cell-muted">@category.Slug</td>
+                            <td class="cell-muted">@(usage.TryGetValue(category.Id, out var count) ? count : 0)</td>
+                            <td>
+                                @if (category.IsVisible) { <span class="badge badge-visible">Visible</span> }
+                                else { <span class="badge badge-hidden">Hidden</span> }
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/Research/CategoryEdit/@category.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    <form method="post" asp-action="CategoryDelete" asp-route-id="@category.Id"
+                                          data-confirm="Delete this category? It must not be used by any research record.">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

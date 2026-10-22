@@ -1,0 +1,181 @@
+@model ProjectDetailViewModel
+@inject IMarkdownService Markdown
+@{
+    var project = Model.Project;
+    var title = project.Title.Pick(project.TitleBn);
+    var summary = project.Summary.PickOptional(project.SummaryBn);
+    var stage = project.Stage switch
+    {
+        ProjectStage.Planned => L["Planned"].Value,
+        ProjectStage.InProgress => L["In progress"].Value,
+        ProjectStage.Completed => L["Completed"].Value,
+        ProjectStage.Maintained => L["Maintained"].Value,
+        _ => L["Archived"].Value
+    };
+    var description = ContentLocalization.IsBangla && project.DescriptionBn is not null ? project.DescriptionBn : project.Description;
+}
+<article class="detail-page">
+    <div class="container">
+        <nav class="breadcrumb" aria-label="@L["Breadcrumb"]">
+            <a href="/">@L["Home"]</a>
+            <span aria-hidden="true">/</span>
+            <a href="/projects">@L["Projects"]</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">@title</span>
+        </nav>
+
+        <header class="detail-header">
+            <div class="detail-header-main">
+                @if (!string.IsNullOrWhiteSpace(project.Category))
+                {
+                    <p class="section-eyebrow">@project.Category</p>
+                }
+                <h1 class="page-title">@title</h1>
+                @if (!string.IsNullOrWhiteSpace(summary))
+                {
+                    <p class="page-lead">@summary</p>
+                }
+                <ul class="detail-meta">
+                    <li><span class="meta-label">@L["Status"]</span><span class="stage-badge stage-@project.Stage.ToString().ToLowerInvariant()">@stage</span></li>
+                    @if (project.StartDate is not null || project.EndDate is not null)
+                    {
+                        <li><span class="meta-label">@L["Timeline"]</span>@(project.StartDate.FormatDate()) — @(project.Stage == ProjectStage.InProgress && project.EndDate is null ? L["Present"].Value : project.EndDate.FormatDate())</li>
+                    }
+                    @if (project.Technologies.Count > 0)
+                    {
+                        <li><span class="meta-label">@L["Stack"]</span>@string.Join(" · ", project.Technologies.Select(t => t.Technology?.Name))</li>
+                    }
+                </ul>
+                <div class="page-actions">
+                    @if (!string.IsNullOrWhiteSpace(project.LiveUrl))
+                    {
+                        <a class="btn btn-primary btn-sm" href="@project.LiveUrl" target="_blank" rel="noopener noreferrer">
+                            <partial name="_Icon" model="@("external-link")" />
+                            <span>@L["Live demo"]</span>
+                        </a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(project.RepositoryUrl))
+                    {
+                        <a class="btn btn-secondary btn-sm" href="@project.RepositoryUrl" target="_blank" rel="noopener noreferrer">
+                            <partial name="_Icon" model="@("github")" />
+                            <span>@L["Repository"]</span>
+                        </a>
+                    }
+                </div>
+            </div>
+        </header>
+
+        @if (project.CoverImage is not null)
+        {
+            <figure class="detail-cover">
+                <img src="/media/@project.CoverImage.Id" alt="@(project.CoverImage.AltText ?? title)" width="1200" height="640" fetchpriority="high" />
+            </figure>
+        }
+
+        <div class="detail-layout">
+            <div class="detail-content">
+                @if (!string.IsNullOrWhiteSpace(description))
+                {
+                    <section class="detail-section">
+                        <h2>@L["Overview"]</h2>
+                        <div class="prose">@Html.Raw(Markdown.ToHtml(description))</div>
+                    </section>
+                }
+                @if (!string.IsNullOrWhiteSpace(project.ProblemStatement))
+                {
+                    <section class="detail-section">
+                        <h2>@L["The problem"]</h2>
+                        <div class="prose">@Html.Raw(Markdown.ToHtml(project.ProblemStatement))</div>
+                    </section>
+                }
+                @if (!string.IsNullOrWhiteSpace(project.Solution))
+                {
+                    <section class="detail-section">
+                        <h2>@L["The solution"]</h2>
+                        <div class="prose">@Html.Raw(Markdown.ToHtml(project.Solution))</div>
+                    </section>
+                }
+                @if (!string.IsNullOrWhiteSpace(project.Features))
+                {
+                    <section class="detail-section">
+                        <h2>@L["Key features"]</h2>
+                        <div class="prose">@Html.Raw(Markdown.ToHtml(project.Features))</div>
+                    </section>
+                }
+
+                @if (project.Images.Count > 0)
+                {
+                    <section class="detail-section">
+                        <h2>@L["Gallery"]</h2>
+                        <div class="gallery-grid">
+                            @foreach (var image in project.Images)
+                            {
+                                <figure class="gallery-item">
+                                    <img src="/media/@image.MediaFileId" alt="@(image.Caption ?? image.MediaFile?.AltText ?? title)" loading="lazy" width="600" height="400" />
+                                    @if (!string.IsNullOrWhiteSpace(image.Caption))
+                                    {
+                                        <figcaption>@image.Caption</figcaption>
+                                    }
+                                </figure>
+                            }
+                        </div>
+                    </section>
+                }
+            </div>
+
+            <aside class="detail-sidebar">
+                <div class="sidebar-card">
+                    <h2>@L["Project details"]</h2>
+                    <dl class="detail-list">
+                        @if (!string.IsNullOrWhiteSpace(project.Category))
+                        {
+                            <div><dt>@L["Category"]</dt><dd>@project.Category</dd></div>
+                        }
+                        <div><dt>@L["Status"]</dt><dd>@stage</dd></div>
+                        @if (project.StartDate is not null)
+                        {
+                            <div><dt>@L["Started"]</dt><dd>@project.StartDate.FormatDate()</dd></div>
+                        }
+                        @if (project.EndDate is not null)
+                        {
+                            <div><dt>@L["Completed"]</dt><dd>@project.EndDate.FormatDate()</dd></div>
+                        }
+                    </dl>
+                </div>
+                @if (project.Technologies.Count > 0)
+                {
+                    <div class="sidebar-card">
+                        <h2>@L["Technologies"]</h2>
+                        <ul class="chip-row">
+                            @foreach (var tech in project.Technologies)
+                            {
+                                <li class="chip">@tech.Technology?.Name</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <div class="sidebar-card sidebar-cta">
+                    <h2>@L["Have a similar project?"]</h2>
+                    <p>@L["I'm happy to discuss requirements and how I can help."]</p>
+                    <a class="btn btn-primary btn-sm" href="/contact">@L["Get in touch"]</a>
+                </div>
+            </aside>
+        </div>
+
+        @if (Model.Related.Count > 0)
+        {
+            <section class="related-section">
+                <div class="section-head">
+                    <h2 class="section-title">@L["Related projects"]</h2>
+                    <a class="text-link" href="/projects">@L["All projects"] <partial name="_Icon" model="@("arrow-right")" /></a>
+                </div>
+                <div class="project-grid project-grid-3">
+                    @foreach (var related in Model.Related)
+                    {
+                        <partial name="_ProjectCard" model="related" />
+                    }
+                </div>
+            </section>
+        }
+    </div>
+</article>

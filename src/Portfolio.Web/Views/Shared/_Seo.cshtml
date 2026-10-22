@@ -1,0 +1,37 @@
+@model SeoModel
+@{
+    var siteName = ViewData["SiteName"] as string ?? "Portfolio";
+    var title = string.IsNullOrWhiteSpace(Model.Title) ? siteName : Model.Title!;
+    var description = string.IsNullOrWhiteSpace(Model.Description) ? null : Model.Description!;
+    var canonicalPath = Model.CanonicalPath ?? Context.Request.Path.ToString();
+    var canonical = $"{Context.Request.Scheme}://{Context.Request.Host}{canonicalPath}";
+    var image = Model.ImageUrl is null
+        ? null
+        : Model.ImageUrl.StartsWith("http") ? Model.ImageUrl : $"{Context.Request.Scheme}://{Context.Request.Host}{Model.ImageUrl}";
+}
+<title>@title</title>
+@if (description is not null)
+{
+    <meta name="description" content="@description" />
+    <meta property="og:description" content="@description" />
+}
+<link rel="canonical" href="@canonical" />
+<meta property="og:type" content="@Model.Type" />
+<meta property="og:title" content="@title" />
+<meta property="og:url" content="@canonical" />
+<meta property="og:site_name" content="@siteName" />
+@if (image is not null)
+{
+    <meta property="og:image" content="@image" />
+    <meta name="twitter:image" content="@image" />
+}
+<meta name="twitter:card" content="@(image is null ? "summary" : "summary_large_image")" />
+<meta name="twitter:title" content="@title" />
+@if (description is not null)
+{
+    <meta name="twitter:description" content="@description" />
+}
+@if (Model.NoIndex || ViewData["IsPreview"] as bool? == true)
+{
+    <meta name="robots" content="noindex, nofollow" />
+}

@@ -1,0 +1,13 @@
+@model ContentStatus
+@switch (Model)
+{
+    case ContentStatus.Published:
+        <span class="badge badge-published">Published</span>
+        break;
+    case ContentStatus.Draft:
+        <span class="badge badge-draft">Draft</span>
+        break;
+    default:
+        <span class="badge badge-archived">Archived</span>
+        break;
+}

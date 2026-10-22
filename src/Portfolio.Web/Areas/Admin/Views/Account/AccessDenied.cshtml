@@ -1,0 +1,12 @@
+@{
+    ViewData["Title"] = "Access denied";
+    ViewData["Section"] = "Account";
+}
+<div class="admin-card" style="max-width:560px;margin:2rem auto">
+    <div class="admin-card-body" style="text-align:center;padding:2.5rem 1.5rem">
+        <span class="empty-icon" style="margin:0 auto 1rem" aria-hidden="true"><partial name="_Icon" model="@("shield")" /></span>
+        <h1 style="font-size:1.3rem;margin-bottom:0.5rem">Access denied</h1>
+        <p class="hint" style="margin-bottom:1.25rem">Your account does not have administrator permissions for this area.</p>
+        <a class="btn btn-secondary btn-sm" href="/">Back to website</a>
+    </div>
+</div>

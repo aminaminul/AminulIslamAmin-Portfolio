@@ -1,0 +1,175 @@
+@model ResearchFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit research" : "New research";
+    ViewData["Section"] = "Portfolio";
+    var categories = ViewData["ResearchCategories"] as IReadOnlyList<ResearchCategory> ?? [];
+    var related = ViewData["RelatedChoices"] as IReadOnlyList<Research> ?? [];
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Required fields are marked. All long-form fields support Markdown with raw HTML disabled.</p>
+    </div>
+    <div class="admin-actions">
+        @if (isEdit)
+        {
+            <a class="btn btn-secondary btn-sm" href="/Admin/Research/Preview/@Model.Id" target="_blank"><partial name="_Icon" model="@("eye")" /> Preview</a>
+        }
+        <a class="btn btn-ghost btn-sm" href="/Admin/Research"><partial name="_Icon" model="@("arrow-left")" /> Back</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Research" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Title and abstract</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Title">Title (English) <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Title" required maxlength="250" />
+                <span class="field-error" asp-validation-for="Title"></span>
+            </div>
+            <div class="field">
+                <label asp-for="TitleBn">Title (Bangla)</label>
+                <input asp-for="TitleBn" maxlength="300" lang="bn" />
+                <span class="field-error" asp-validation-for="TitleBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Slug">Slug</label>
+                <input asp-for="Slug" maxlength="180" placeholder="generated-from-the-title" />
+                <span class="hint">Must be unique. Leave empty to generate.</span>
+                <span class="field-error" asp-validation-for="Slug"></span>
+            </div>
+            <div class="field">
+                <label asp-for="CategoryId">Category</label>
+                <select asp-for="CategoryId">
+                    <option value="">Uncategorised</option>
+                    @foreach (var category in categories)
+                    {
+                        <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">@category.Name</option>
+                    }
+                </select>
+                <span class="field-error" asp-validation-for="CategoryId"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Abstract">Abstract (English)</label>
+                <textarea asp-for="Abstract" rows="6"></textarea>
+                <span class="field-error" asp-validation-for="Abstract"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="AbstractBn">Abstract (Bangla)</label>
+                <textarea asp-for="AbstractBn" rows="5" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="AbstractBn"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Keywords">Keywords</label>
+                <input asp-for="Keywords" maxlength="500" placeholder="machine learning, accessibility, web performance" />
+                <span class="hint">Comma-separated and used by public search.</span>
+                <span class="field-error" asp-validation-for="Keywords"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Authors and contributors</h2>
+        <div class="field">
+            <label asp-for="AuthorsText">Authors</label>
+            <textarea asp-for="AuthorsText" rows="4" placeholder="Jane Doe | University of Example | Lead author&#10;John Smith | Example Lab"></textarea>
+            <span class="hint">One person per line: Name | Affiliation | Role. Affiliation and role are optional. Do not add authors who did not contribute.</span>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Research sections</h2>
+        <p class="section-hint">Only fill in sections that genuinely apply. Empty sections are not rendered.</p>
+        <div class="form-grid">
+            <div class="field span-2"><label asp-for="Introduction">Introduction (Markdown)</label><textarea asp-for="Introduction" rows="5"></textarea></div>
+            <div class="field span-2"><label asp-for="Methodology">Methodology (Markdown)</label><textarea asp-for="Methodology" rows="5"></textarea></div>
+            <div class="field"><label asp-for="Tools">Tools</label><input asp-for="Tools" maxlength="600" /><span class="hint">Comma-separated.</span></div>
+            <div class="field"><label asp-for="Datasets">Datasets</label><input asp-for="Datasets" maxlength="600" /><span class="hint">Names, versions or links.</span></div>
+            <div class="field span-2"><label asp-for="Experiments">Experiments (Markdown)</label><textarea asp-for="Experiments" rows="5"></textarea></div>
+            <div class="field span-2"><label asp-for="Findings">Findings (Markdown)</label><textarea asp-for="Findings" rows="5"></textarea></div>
+            <div class="field"><label asp-for="Discussion">Discussion (Markdown)</label><textarea asp-for="Discussion" rows="5"></textarea></div>
+            <div class="field"><label asp-for="Limitations">Limitations (Markdown)</label><textarea asp-for="Limitations" rows="5"></textarea></div>
+            <div class="field"><label asp-for="Conclusion">Conclusion (Markdown)</label><textarea asp-for="Conclusion" rows="5"></textarea></div>
+            <div class="field"><label asp-for="FutureWork">Future work (Markdown)</label><textarea asp-for="FutureWork" rows="5"></textarea></div>
+            <div class="field span-2"><label asp-for="References">References (Markdown)</label><textarea asp-for="References" rows="6"></textarea></div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Publication</h2>
+        <div class="form-grid">
+            <div class="field"><label asp-for="StartDate">Start date</label><input asp-for="StartDate" type="date" asp-format="{0:yyyy-MM-dd}" /></div>
+            <div class="field"><label asp-for="PublicationDate">Publication date</label><input asp-for="PublicationDate" type="date" asp-format="{0:yyyy-MM-dd}" /><span class="hint">Leave empty for unpublished work in progress.</span></div>
+            <div class="field"><label asp-for="PublicationVenue">Publication venue</label><input asp-for="PublicationVenue" maxlength="250" /></div>
+            <div class="field"><label asp-for="Journal">Journal or conference</label><input asp-for="Journal" maxlength="250" /></div>
+            <div class="field"><label asp-for="Doi">DOI</label><input asp-for="Doi" maxlength="200" placeholder="10.xxxx/xxxxx" /><span class="hint">Only add a DOI that actually resolves.</span></div>
+            <div class="field"><label asp-for="ExternalUrl">External publication URL</label><input asp-for="ExternalUrl" type="url" maxlength="600" /></div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Documents and imagery</h2>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("CoverImage", "Cover image", Model.CoverImageMediaId,
+                ViewData["CoverImageChoices"] as IEnumerable<MediaFile> ?? [], null))" />
+            <partial name="_MediaField" model="@(new MediaFieldModel("Pdf", "Full-text PDF", Model.PdfMediaId,
+                ViewData["PdfChoices"] as IEnumerable<MediaFile> ?? [], "Visitors can download this PDF from the public detail page.", true))" />
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Tags and related research</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="TagsCsv">Tags</label>
+                <input asp-for="TagsCsv" maxlength="400" placeholder="machine learning, NLP, accessibility" />
+                <span class="hint">Comma-separated. Tags become public filters.</span>
+            </div>
+            <div class="field">
+                <label asp-for="RelatedIds">Related research</label>
+                <select id="RelatedIds" name="RelatedIds" multiple size="6">
+                    @foreach (var option in related)
+                    {
+                        <option value="@option.Id" selected="@Model.RelatedIds.Contains(option.Id)">@option.Title</option>
+                    }
+                </select>
+                <span class="hint">Hold Ctrl/Cmd to select multiple. Only published records are listed.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Publishing and SEO</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Status">Publication status</label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<ContentStatus>()"></select>
+                <span class="hint">Only published records appear publicly, in search, and in the sitemap.</span>
+                <span class="field-error" asp-validation-for="Status"></span>
+            </div>
+            <div class="field"><label asp-for="DisplayOrder">Display order</label><input asp-for="DisplayOrder" type="number" min="0" max="999" /></div>
+            <div class="field"><label asp-for="SeoTitle">SEO title</label><input asp-for="SeoTitle" maxlength="200" /></div>
+            <div class="field"><label asp-for="SeoDescription">SEO description</label><input asp-for="SeoDescription" maxlength="400" /></div>
+        </div>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="IsFeatured" />
+                <label for="IsFeatured">Feature on the home page</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/Research">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save research" : "Create research")</span>
+        </button>
+    </div>
+</form>

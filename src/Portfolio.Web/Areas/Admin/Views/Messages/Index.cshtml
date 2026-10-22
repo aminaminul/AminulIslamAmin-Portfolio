@@ -1,0 +1,108 @@
+@model PagedList<ContactMessage>
+@{
+    ViewData["Title"] = "Messages";
+    ViewData["Section"] = "Overview";
+    var filter = ViewData["Filter"] as string ?? "all";
+    var q = ViewData["Q"] as string;
+    var unread = ViewData["UnreadCount"] as int? ?? 0;
+    var archived = ViewData["ArchivedCount"] as int? ?? 0;
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Messages</h1>
+        <p>Contact form submissions stored in SQL Server. Email delivery status is shown per message.</p>
+    </div>
+</div>
+
+<div class="admin-toolbar">
+    <div class="filter-tabs" role="group" aria-label="Filter messages">
+        <a class="filter-tab @(filter == "all" ? "is-active" : null)" href="@Url.Action("Index", new { filter = "all" })">Inbox</a>
+        <a class="filter-tab @(filter == "unread" ? "is-active" : null)" href="@Url.Action("Index", new { filter = "unread" })">Unread (@unread)</a>
+        <a class="filter-tab @(filter == "read" ? "is-active" : null)" href="@Url.Action("Index", new { filter = "read" })">Read</a>
+        <a class="filter-tab @(filter == "archived" ? "is-active" : null)" href="@Url.Action("Index", new { filter = "archived" })">Archived (@archived)</a>
+    </div>
+    <form class="admin-filters" method="get" action="/Admin/Messages" role="search">
+        <input type="hidden" name="filter" value="@filter" />
+        <label class="sr-only" for="message-q">Search messages</label>
+        <input id="message-q" type="search" name="q" value="@q" placeholder="Search name, email or text" />
+        <button class="btn btn-secondary" type="submit">Search</button>
+        @if (!string.IsNullOrWhiteSpace(q))
+        {
+            <a class="btn btn-ghost" href="@Url.Action("Index", new { filter })">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="admin-card">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No messages here", "When a visitor uses the contact form, their message appears in this inbox.", "mail"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:220px">From</th>
+                        <th>Subject &amp; preview</th>
+                        <th style="width:160px">Received</th>
+                        <th style="width:130px">Status</th>
+                        <th style="width:180px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var message in Model.Items)
+                    {
+                        <tr style="@(message.IsRead ? null : "font-weight:600")">
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@message.Name</strong>
+                                    <span>@message.Email</span>
+                                </div>
+                            </td>
+                            <td style="max-width:420px">
+                                <div class="cell-title">
+                                    <strong>@(string.IsNullOrWhiteSpace(message.Subject) ? "(no subject)" : message.Subject)</strong>
+                                    <span>@(message.Message.Length > 110 ? message.Message[..110] + "…" : message.Message)</span>
+                                </div>
+                            </td>
+                            <td class="cell-muted">@message.CreatedAt.ToLocalTime().ToString("d MMM yyyy, HH:mm")</td>
+                            <td>
+                                @if (!message.IsRead) { <span class="badge badge-draft">Unread</span> }
+                                else if (message.IsArchived) { <span class="badge badge-archived">Archived</span> }
+                                else { <span class="badge badge-published">Read</span> }
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/Messages/Details/@message.Id" aria-label="Open message"><partial name="_Icon" model="@("eye")" /></a>
+                                    <form method="post" asp-action="ToggleRead" asp-route-id="@message.Id">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="@(message.IsRead ? "Mark unread" : "Mark read")"><partial name="_Icon" model="@("check")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="ToggleArchive" asp-route-id="@message.Id">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="@(message.IsArchived ? "Restore" : "Archive")"><partial name="_Icon" model="@("folder")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Delete" asp-route-id="@message.Id" data-confirm="Delete this message permanently?">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.TotalPages > 1)
+        {
+            <div class="admin-card-footer">
+                <partial name="_Pager" model="@(new PagerModel(Model.Page, Model.TotalPages,
+                    page => Url.Action("Index", new { filter, q, page })!))" />
+            </div>
+        }
+    }
+</div>

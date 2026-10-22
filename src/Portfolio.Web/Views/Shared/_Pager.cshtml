@@ -1,0 +1,37 @@
+@model PagerModel
+@if (Model.TotalPages > 1)
+{
+    <nav class="pagination" aria-label="@L["Pagination"]">
+        @if (Model.Page > 1)
+        {
+            <a class="page-link" href="@Model.UrlFor(Model.Page - 1)" rel="prev">
+                <partial name="_Icon" model="@("chevron-left")" />
+                <span>@L["Previous"]</span>
+            </a>
+        }
+        else
+        {
+            <span class="page-link is-disabled" aria-disabled="true">
+                <partial name="_Icon" model="@("chevron-left")" />
+                <span>@L["Previous"]</span>
+            </span>
+        }
+
+        <span class="page-status">@L["Page"] @Model.Page @L["of"] @Model.TotalPages</span>
+
+        @if (Model.Page < Model.TotalPages)
+        {
+            <a class="page-link" href="@Model.UrlFor(Model.Page + 1)" rel="next">
+                <span>@L["Next"]</span>
+                <partial name="_Icon" model="@("chevron-right")" />
+            </a>
+        }
+        else
+        {
+            <span class="page-link is-disabled" aria-disabled="true">
+                <span>@L["Next"]</span>
+                <partial name="_Icon" model="@("chevron-right")" />
+            </span>
+        }
+    </nav>
+}

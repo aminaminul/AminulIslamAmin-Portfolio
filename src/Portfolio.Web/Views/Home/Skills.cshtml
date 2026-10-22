@@ -1,0 +1,76 @@
+@model SkillsViewModel
+@{
+    var name = Model.Profile.DisplayName(Model.Settings);
+}
+<section class="page-hero page-hero-sm">
+    <div class="container">
+        <p class="section-eyebrow">@L["Skills"]</p>
+        <h1 class="page-title">@L["Skills & technologies"]</h1>
+        <p class="page-lead">@string.Format(L["The tools and technologies {0} works with."], name)</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        @if (Model.Categories.Count == 0)
+        {
+            <partial name="_Empty" model="@(new EmptyStateModel(L["No skills listed yet"].Value, L["Skills added in the admin panel appear here, grouped by category."].Value, "layers"))" />
+        }
+        else
+        {
+            <div class="skills-grid">
+                @foreach (var category in Model.Categories)
+                {
+                    <section class="skill-panel" data-reveal>
+                        <header class="skill-panel-head">
+                            <h2>@category.Name.Pick(category.NameBn)</h2>
+                            <span class="count">@category.Skills.Count</span>
+                        </header>
+                        <ul class="skill-detail-list">
+                            @foreach (var skill in category.Skills)
+                            {
+                                <li class="skill-detail">
+                                    <div class="skill-detail-head">
+                                        <span class="skill-icon" aria-hidden="true"><partial name="_Icon" model="@(skill.IconName ?? "code")" /></span>
+                                        <span class="skill-name">@skill.Name.Pick(skill.NameBn)</span>
+                                        @if (skill.Proficiency is not null)
+                                        {
+                                            <span class="skill-level">@skill.Proficiency%</span>
+                                        }
+                                    </div>
+                                    @if (skill.Proficiency is not null)
+                                    {
+                                        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                                             aria-valuenow="@skill.Proficiency" aria-label="@skill.Name">
+                                            <span style="width: @(skill.Proficiency)%"></span>
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(skill.Description))
+                                    {
+                                        <p class="skill-description">@skill.Description.Pick(skill.DescriptionBn)</p>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-panel">
+            <div>
+                <p class="section-eyebrow">@L["Contact"]</p>
+                <h2>@L["Let's build something together"]</h2>
+                <p>@L["Have a project that needs these skills? Let's talk about it."]</p>
+            </div>
+            <div class="cta-actions">
+                <a class="btn btn-primary" href="/contact">@L["Get in touch"] <partial name="_Icon" model="@("arrow-right")" /></a>
+                <a class="btn btn-secondary" href="/projects">@L["View projects"]</a>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,108 @@
+@model SiteSettingsFormModel
+@{
+    ViewData["Title"] = "Website settings";
+    ViewData["Section"] = "Site";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Website settings</h1>
+        <p>Site identity, logo, availability indicator and default theme. These values appear across the public website.</p>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Settings" asp-action="Index" enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Identity</h2>
+        <p class="section-hint">The site name is used in page titles, the footer and as a fallback when no display name is set.</p>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="SiteName">Site name <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="SiteName" required maxlength="120" />
+                <span class="field-error" asp-validation-for="SiteName"></span>
+            </div>
+            <div class="field">
+                <label asp-for="SiteNameBn">Site name (Bangla)</label>
+                <input asp-for="SiteNameBn" maxlength="120" lang="bn" />
+                <span class="field-error" asp-validation-for="SiteNameBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Tagline">Tagline (English)</label>
+                <input asp-for="Tagline" maxlength="200" />
+                <span class="field-error" asp-validation-for="Tagline"></span>
+            </div>
+            <div class="field">
+                <label asp-for="TaglineBn">Tagline (Bangla)</label>
+                <input asp-for="TaglineBn" maxlength="200" lang="bn" />
+                <span class="field-error" asp-validation-for="TaglineBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="LogoText">Logo text</label>
+                <input asp-for="LogoText" maxlength="60" placeholder="Optional short brand text" />
+                <span class="field-error" asp-validation-for="LogoText"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Logo</h2>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("Logo", "Logo image", Model.LogoMediaId,
+                ViewData["LogoChoices"] as IEnumerable<MediaFile> ?? [], "A square mark works best. If empty, a monogram is generated from the site name."))" />
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Availability</h2>
+        <p class="section-hint">Shown as a status indicator in the hero, footer and contact page. Only appears when enabled and text is supplied.</p>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="IsAvailable" />
+                <label for="IsAvailable">Show availability indicator</label>
+            </div>
+        </div>
+        <div class="form-grid" style="margin-top:1rem">
+            <div class="field">
+                <label asp-for="AvailabilityText">Availability text (English)</label>
+                <input asp-for="AvailabilityText" maxlength="160" placeholder="Available for freelance work" />
+                <span class="field-error" asp-validation-for="AvailabilityText"></span>
+            </div>
+            <div class="field">
+                <label asp-for="AvailabilityTextBn">Availability text (Bangla)</label>
+                <input asp-for="AvailabilityTextBn" maxlength="160" lang="bn" />
+                <span class="field-error" asp-validation-for="AvailabilityTextBn"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Appearance</h2>
+        <p class="section-hint">Visitors can always switch themes. This value is the initial preference when they have not chosen one.</p>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="DefaultTheme">Default theme</label>
+                <select asp-for="DefaultTheme">
+                    <option value="system">Match system preference</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+                <span class="field-error" asp-validation-for="DefaultTheme"></span>
+            </div>
+            <div class="field">
+                <label asp-for="AccentColor">Accent colour</label>
+                <input asp-for="AccentColor" maxlength="20" placeholder="#2f6fed" />
+                <span class="hint">Optional six-digit hex value. Leave empty for the default blue.</span>
+                <span class="field-error" asp-validation-for="AccentColor"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">Save settings</span>
+        </button>
+    </div>
+</form>

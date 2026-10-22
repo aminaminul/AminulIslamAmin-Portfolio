@@ -1,0 +1,104 @@
+@model CertificationFormModel
+@{
+    var isEdit = Model.Id != 0;
+    ViewData["Title"] = isEdit ? "Edit certification" : "New certification";
+    ViewData["Section"] = "Portfolio";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Credential IDs and verification URLs are shown publicly; leave them empty if unavailable.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Certifications"><partial name="_Icon" model="@("arrow-left")" /> Back</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Certifications" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@(isEdit ? Model.Id : (int?)null)"
+      enctype="multipart/form-data" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Certificate</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Title">Title (English) <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Title" required maxlength="200" />
+                <span class="field-error" asp-validation-for="Title"></span>
+            </div>
+            <div class="field">
+                <label asp-for="TitleBn">Title (Bangla)</label>
+                <input asp-for="TitleBn" maxlength="240" lang="bn" />
+                <span class="field-error" asp-validation-for="TitleBn"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Issuer">Issuer <span class="required" aria-hidden="true">*</span></label>
+                <input asp-for="Issuer" required maxlength="200" />
+                <span class="field-error" asp-validation-for="Issuer"></span>
+            </div>
+            <div class="field">
+                <label asp-for="IssuerUrl">Issuer website</label>
+                <input asp-for="IssuerUrl" type="url" maxlength="600" />
+                <span class="field-error" asp-validation-for="IssuerUrl"></span>
+            </div>
+            <div class="field">
+                <label asp-for="IssueDate">Issue date</label>
+                <input asp-for="IssueDate" type="date" asp-format="{0:yyyy-MM-dd}" />
+            </div>
+            <div class="field">
+                <label asp-for="ExpiryDate">Expiry date</label>
+                <input asp-for="ExpiryDate" type="date" asp-format="{0:yyyy-MM-dd}" />
+                <span class="hint">Leave empty if it does not expire.</span>
+            </div>
+            <div class="field">
+                <label asp-for="CredentialId">Credential ID</label>
+                <input asp-for="CredentialId" maxlength="160" />
+                <span class="field-error" asp-validation-for="CredentialId"></span>
+            </div>
+            <div class="field">
+                <label asp-for="VerificationUrl">Verification URL</label>
+                <input asp-for="VerificationUrl" type="url" maxlength="600" />
+                <span class="field-error" asp-validation-for="VerificationUrl"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="Description">Description (English)</label>
+                <textarea asp-for="Description" rows="3"></textarea>
+            </div>
+            <div class="field span-2">
+                <label asp-for="DescriptionBn">Description (Bangla)</label>
+                <textarea asp-for="DescriptionBn" rows="3" lang="bn"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Certificate image</h2>
+        <div class="form-grid">
+            <partial name="_MediaField" model="@(new MediaFieldModel("Image", "Certificate image", Model.ImageMediaId,
+                ViewData["ImageChoices"] as IEnumerable<MediaFile> ?? [], "Optional. Only upload images you have the right to publish."))" />
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Publishing</h2>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Status">Status</label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<ContentStatus>()"></select>
+            </div>
+            <div class="field">
+                <label asp-for="DisplayOrder">Display order</label>
+                <input asp-for="DisplayOrder" type="number" min="0" max="999" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin/Certifications">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">@(isEdit ? "Save changes" : "Create certification")</span>
+        </button>
+    </div>
+</form>

@@ -1,0 +1,79 @@
+@model ContactSettingsFormModel
+@{
+    ViewData["Title"] = "Contact information";
+    ViewData["Section"] = "Site";
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Contact information</h1>
+        <p>Public contact details and contact-form behaviour. Messages are always stored in the database inbox.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Messages"><partial name="_Icon" model="@("mail")" /> View messages</a>
+    </div>
+</div>
+
+<form method="post" asp-area="Admin" asp-controller="Settings" asp-action="Contact" class="admin-card admin-form" data-track-dirty>
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert" style="margin:1.25rem 1.25rem 0"></div>
+
+    <div class="form-section">
+        <h2>Contact details</h2>
+        <p class="section-hint">Only filled fields are shown. Never publish details you do not want indexed publicly.</p>
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="ContactEmail">Public email</label>
+                <input asp-for="ContactEmail" type="email" maxlength="200" />
+                <span class="field-error" asp-validation-for="ContactEmail"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ContactPhone">Phone</label>
+                <input asp-for="ContactPhone" type="tel" maxlength="40" />
+                <span class="field-error" asp-validation-for="ContactPhone"></span>
+            </div>
+            <div class="field">
+                <label asp-for="ContactLocation">Location</label>
+                <input asp-for="ContactLocation" maxlength="160" />
+                <span class="field-error" asp-validation-for="ContactLocation"></span>
+            </div>
+        </div>
+        <div class="form-grid">
+            <div class="field span-2">
+                <label asp-for="ContactIntro">Contact introduction (English)</label>
+                <textarea asp-for="ContactIntro" rows="3" maxlength="1000"></textarea>
+                <span class="field-error" asp-validation-for="ContactIntro"></span>
+            </div>
+            <div class="field span-2">
+                <label asp-for="ContactIntroBn">Contact introduction (Bangla)</label>
+                <textarea asp-for="ContactIntroBn" rows="3" maxlength="1000" lang="bn"></textarea>
+                <span class="field-error" asp-validation-for="ContactIntroBn"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Contact form</h2>
+        <p class="section-hint">Submissions are validated, rate limited and saved to SQL Server. Email delivery is optional and configured on the server.</p>
+        <div class="check-grid">
+            <div class="check-card">
+                <input asp-for="ShowContactForm" />
+                <label for="ShowContactForm">Accept messages through the contact form</label>
+            </div>
+        </div>
+        <div class="form-grid" style="margin-top:1rem">
+            <div class="field">
+                <label asp-for="ContactFormRecipient">Notification recipient</label>
+                <input asp-for="ContactFormRecipient" type="email" maxlength="200" />
+                <span class="hint">Where new-message notifications are emailed. Falls back to the public email. Email must be configured on the server.</span>
+                <span class="field-error" asp-validation-for="ContactFormRecipient"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <a class="btn btn-ghost" href="/Admin">Cancel</a>
+        <button class="btn btn-primary" type="submit" data-submit-once data-loading-label="Saving…">
+            <span class="btn-label">Save contact settings</span>
+        </button>
+    </div>
+</form>

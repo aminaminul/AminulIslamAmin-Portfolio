@@ -1,0 +1,123 @@
+@model Project
+@{
+    ViewData["Title"] = "Gallery · " + Model.Title;
+    ViewData["Section"] = "Portfolio";
+    var images = ViewData["NewImageChoices"] as IEnumerable<MediaFile> ?? [];
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Gallery</h1>
+        <p>@Model.Title — upload screenshots, choose the cover image and remove gallery entries.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-secondary btn-sm" href="/Admin/Projects/Edit/@Model.Id"><partial name="_Icon" model="@("edit")" /> Edit project</a>
+        <a class="btn btn-ghost btn-sm" href="/Admin/Projects"><partial name="_Icon" model="@("arrow-left")" /> Projects</a>
+    </div>
+</div>
+
+<div class="admin-grid admin-grid-2">
+    <div style="display:flex;flex-direction:column;gap:1.25rem">
+        <section class="admin-card">
+            <div class="admin-card-head">
+                <div><h2>Cover image</h2><p>Shown on project cards and the detail header.</p></div>
+            </div>
+            <div class="admin-card-body">
+                @if (Model.CoverImage is not null)
+                {
+                    <div class="media-preview" style="margin-bottom:1rem">
+                        <img src="/media/@Model.CoverImage.Id" alt="" width="64" height="64" />
+                        <span class="preview-meta">
+                            <strong>@Model.CoverImage.OriginalName</strong>
+                            <span>Current cover</span>
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <p class="hint" style="margin-bottom:1rem">No cover image selected. Set one from the gallery below or upload via the project editor.</p>
+                }
+                <form method="post" asp-action="UploadImages" asp-route-id="@Model.Id" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="field">
+                        <label for="files">Upload images</label>
+                        <input id="files" name="files" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple />
+                        <span class="hint">Up to 10 images per upload, max 8 MB each.</span>
+                    </div>
+                    <button class="btn btn-primary btn-sm" type="submit" data-submit-once data-loading-label="Uploading…" style="margin-top:0.75rem">
+                        <partial name="_Icon" model="@("upload")" /><span class="btn-label">Upload</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section class="admin-card">
+            <div class="admin-card-head">
+                <div><h2>Choose from library</h2><p>Reuse an existing upload as the cover.</p></div>
+            </div>
+            <div class="admin-card-body">
+                @if (!images.Any())
+                {
+                    <p class="hint">The media library has no images yet.</p>
+                }
+                else
+                {
+                    <form method="post" asp-action="SetCover" asp-route-id="@Model.Id" class="admin-filters">
+                        @Html.AntiForgeryToken()
+                        <label class="sr-only" for="mediaId">Image</label>
+                        <select id="mediaId" name="mediaId">
+                            @foreach (var image in images)
+                            {
+                                <option value="@image.Id">@image.OriginalName</option>
+                            }
+                        </select>
+                        <button class="btn btn-secondary btn-sm" type="submit">Set as cover</button>
+                    </form>
+                }
+            </div>
+        </section>
+    </div>
+
+    <section class="admin-card">
+        <div class="admin-card-head">
+            <div><h2>Gallery images</h2><p>@Model.Images.Count image(s) in this project.</p></div>
+        </div>
+        <div class="admin-card-body">
+            @if (Model.Images.Count == 0)
+            {
+                <partial name="_Empty" model="@(new EmptyStateModel("No gallery images", "Upload screenshots to show how the project works.", "image"))" />
+            }
+            else
+            {
+                <div class="media-grid">
+                    @foreach (var image in Model.Images.OrderBy(i => i.DisplayOrder))
+                    {
+                        <div class="media-tile">
+                            <div class="media-thumb">
+                                @if (image.MediaFile is not null)
+                                {
+                                    <img src="/media/@image.MediaFileId" alt="@(image.MediaFile.AltText ?? $"Project image {image.DisplayOrder}")" loading="lazy" />
+                                }
+                            </div>
+                            <div class="media-info">
+                                <strong>@(image.MediaFile?.OriginalName ?? "Missing file")</strong>
+                                <span>Order @image.DisplayOrder</span>
+                            </div>
+                            <div class="media-actions">
+                                <form method="post" asp-action="SetCover" asp-route-id="@Model.Id">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="mediaId" value="@image.MediaFileId" />
+                                    <button class="icon-action" type="submit" aria-label="Set as cover" title="Set as cover"><partial name="_Icon" model="@("star")" /></button>
+                                </form>
+                                <form method="post" asp-action="RemoveImage" asp-route-id="@Model.Id" asp-route-imageId="@image.Id"
+                                      data-confirm="Remove this image from the project gallery? The file stays in the media library.">
+                                    @Html.AntiForgeryToken()
+                                    <button class="icon-action danger" type="submit" aria-label="Remove image"><partial name="_Icon" model="@("trash")" /></button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+</div>

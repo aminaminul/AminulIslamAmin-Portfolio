@@ -1,0 +1,120 @@
+@model AdminListViewModel<Education>
+@{
+    ViewData["Title"] = "Education";
+    ViewData["Section"] = "Portfolio";
+    var statuses = new[] { ("", "All"), ("published", "Published"), ("draft", "Drafts") };
+}
+<div class="admin-page-head">
+    <div>
+        <h1>Education</h1>
+        <p>Academic history. Do not add institutions, degrees or grades that have not been earned.</p>
+    </div>
+    <div class="admin-actions">
+        <a class="btn btn-primary btn-sm" href="/Admin/Education/Create"><partial name="_Icon" model="@("plus")" /> New qualification</a>
+    </div>
+</div>
+
+<div class="admin-toolbar">
+    <div class="filter-tabs" role="group" aria-label="Filter by status">
+        @foreach (var (value, label) in statuses)
+        {
+            <a class="filter-tab @(Model.Status == (string.IsNullOrEmpty(value) ? null : value) ? "is-active" : null)"
+               href="@Url.Action("Index", "Education", new { q = Model.Q, status = string.IsNullOrEmpty(value) ? null : value })">@label</a>
+        }
+    </div>
+    <form class="admin-filters" method="get" action="/Admin/Education" role="search">
+        <label class="sr-only" for="edu-q">Search education</label>
+        <input id="edu-q" type="search" name="q" value="@Model.Q" placeholder="Search institution or qualification" />
+        <input type="hidden" name="status" value="@Model.Status" />
+        <button class="btn btn-secondary" type="submit">Search</button>
+        @if (Model.HasFilters)
+        {
+            <a class="btn btn-ghost" href="/Admin/Education">Clear</a>
+        }
+    </form>
+</div>
+
+<div class="admin-card">
+    @if (Model.Items.Count == 0)
+    {
+        <div class="admin-card-body">
+            <partial name="_Empty" model="@(new EmptyStateModel("No education records", "Add a qualification to show your academic background.", "graduation-cap", "/Admin/Education/Create", "Add qualification"))" />
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width:80px">Order</th>
+                        <th>Qualification</th>
+                        <th style="width:200px">Period</th>
+                        <th style="width:110px">Status</th>
+                        <th style="width:220px"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-start">
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move up"><partial name="_Icon" model="@("arrow-up")" /></button>
+                                    </form>
+                                    <form method="post" asp-action="Move" asp-route-id="@item.Id" asp-route-direction="1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action" type="submit" aria-label="Move down"><partial name="_Icon" model="@("arrow-down")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-title">
+                                    <strong>@(item.Qualification ?? "Qualification")</strong>
+                                    <span>@item.Institution @(string.IsNullOrWhiteSpace(item.Subject) ? "" : $"· {item.Subject}")</span>
+                                </div>
+                            </td>
+                            <td class="cell-muted">
+                                @(item.StartDate.FormatDate()) — @(item.IsCurrent ? "Present" : item.EndDate.FormatDate())
+                                @if (!string.IsNullOrWhiteSpace(item.Result))
+                                {
+                                    <span class="badge badge-plain" style="margin-left:0.35rem">@item.Result</span>
+                                }
+                            </td>
+                            <td><partial name="_StatusBadge" model="item.Status" /></td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="icon-action" href="/Admin/Education/Edit/@item.Id" aria-label="Edit"><partial name="_Icon" model="@("edit")" /></a>
+                                    @if (item.Status == ContentStatus.Published)
+                                    {
+                                        <form method="post" asp-action="Unpublish" asp-route-id="@item.Id" data-confirm="Move this qualification to draft?">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Unpublish"><partial name="_Icon" model="@("eye")" /></button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-action="Publish" asp-route-id="@item.Id">
+                                            @Html.AntiForgeryToken()
+                                            <button class="icon-action" type="submit" aria-label="Publish"><partial name="_Icon" model="@("check")" /></button>
+                                        </form>
+                                    }
+                                    <form method="post" asp-action="Delete" asp-route-id="@item.Id" data-confirm="Delete this education record?">
+                                        @Html.AntiForgeryToken()
+                                        <button class="icon-action danger" type="submit" aria-label="Delete"><partial name="_Icon" model="@("trash")" /></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Pager is not null)
+        {
+            <div class="admin-card-footer"><partial name="_Pager" model="Model.Pager" /></div>
+        }
+    }
+</div>
