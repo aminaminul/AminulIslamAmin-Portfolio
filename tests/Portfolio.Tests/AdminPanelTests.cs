@@ -74,6 +74,18 @@ public class AdminPanelTests
     }
 
     [Fact]
+    public async Task SignedInNonAdministrator_CannotAccessChangePassword()
+    {
+        await _factory.EnsureStandardUserAsync();
+        var client = await _factory.SignInStandardUserAsync();
+
+        var response = await client.GetAsync("/Admin/Account/ChangePassword");
+
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("/Admin/Account/AccessDenied", response.Headers.Location!.ToString());
+    }
+
+    [Fact]
     public async Task Login_WithWrongPassword_ShowsGenericMessage()
     {
         var client = _factory.CreateApiClient();
@@ -363,6 +375,96 @@ public class AdminPanelTests
             var skill = await db.Skills.FirstOrDefaultAsync(s => s.Name == $"Skill {token}");
             Assert.NotNull(skill);
             Assert.Equal(category.Id, skill!.CategoryId);
+        });
+    }
+
+    [Fact]
+    public async Task AdminMediaLifecycle_UploadServeRangeProtectAndDelete()
+    {
+        var token = TestData.Token();
+        var admin = await _factory.SignInAdminAsync();
+        var antToken = await PortfolioAppFactory.GetAntiforgeryTokenAsync(admin, "/Admin/Media");
+
+        // 1. Upload an image
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent(antToken), "__RequestVerificationToken");
+        content.Add(new StringContent(((int)MediaKind.Image).ToString()), "Kind");
+        content.Add(new StringContent($"Alt for {token}"), "AltText");
+        var dummyPng = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D };
+        content.Add(new ByteArrayContent(dummyPng), "File", $"test-{token}.png");
+
+        var uploadResponse = await admin.PostAsync("/Admin/Media/Upload", content);
+        Assert.Equal(HttpStatusCode.Redirect, uploadResponse.StatusCode);
+
+        MediaFile? media = null;
+        await _factory.WithDbAsync(async db =>
+        {
+            media = await db.MediaFiles.FirstOrDefaultAsync(m => m.AltText == $"Alt for {token}");
+        });
+        Assert.NotNull(media);
+
+        // 2. Public GET
+        var publicClient = _factory.CreateApiClient();
+        var serveResponse = await publicClient.GetAsync($"/media/{media!.Id}");
+        Assert.Equal(HttpStatusCode.OK, serveResponse.StatusCode);
+        Assert.Equal("image/png", serveResponse.Content.Headers.ContentType?.MediaType);
+
+        // 3. Public GET with Range request
+        var rangeReq = new HttpRequestMessage(HttpMethod.Get, $"/media/{media.Id}");
+        rangeReq.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(0, 3);
+        var rangeResponse = await publicClient.SendAsync(rangeReq);
+        Assert.Equal(HttpStatusCode.PartialContent, rangeResponse.StatusCode);
+
+        // 4. Update Alt text
+        var updateAlt = await _factory.PostFormAsync(admin, $"/Admin/Media/UpdateAlt?id={media.Id}", "/Admin/Media",
+            new Dictionary<string, string?> { ["id"] = media.Id.ToString(), ["altText"] = $"Updated Alt {token}" });
+        Assert.Equal(HttpStatusCode.Redirect, updateAlt.StatusCode);
+
+        await _factory.WithDbAsync(async db =>
+        {
+            var reloaded = await db.MediaFiles.FindAsync(media.Id);
+            Assert.Equal($"Updated Alt {token}", reloaded?.AltText);
+        });
+
+        // 5. In-use protection: attach media to a project
+        int projectId = 0;
+        await _factory.WithDbAsync(async db =>
+        {
+            var p = new Project
+            {
+                Title = $"Project using media {token}",
+                Slug = $"proj-media-{token}",
+                CoverImageMediaId = media.Id,
+                Status = ContentStatus.Draft
+            };
+            db.Projects.Add(p);
+            await db.SaveChangesAsync();
+            projectId = p.Id;
+        });
+
+        // Attempt delete when in-use
+        var deleteAttempt = await _factory.PostFormAsync(admin, $"/Admin/Media/Delete?id={media.Id}", "/Admin/Media",
+            new Dictionary<string, string?>());
+        Assert.Equal(HttpStatusCode.Redirect, deleteAttempt.StatusCode);
+
+        // Media should STILL exist
+        await _factory.WithDbAsync(async db =>
+        {
+            Assert.NotNull(await db.MediaFiles.FindAsync(media.Id));
+            // Unlink media from project
+            var p = await db.Projects.FindAsync(projectId);
+            p!.CoverImageMediaId = null;
+            await db.SaveChangesAsync();
+        });
+
+        // 6. Delete unused media
+        var deleteSuccess = await _factory.PostFormAsync(admin, $"/Admin/Media/Delete?id={media.Id}", "/Admin/Media",
+            new Dictionary<string, string?>());
+        Assert.Equal(HttpStatusCode.Redirect, deleteSuccess.StatusCode);
+
+        await _factory.WithDbAsync(async db =>
+        {
+            Assert.Null(await db.MediaFiles.FindAsync(media.Id));
         });
     }
 }

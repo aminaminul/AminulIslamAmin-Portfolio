@@ -93,4 +93,56 @@ public class ContactFormTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(0, await TestData.CountContactMessagesAsync(_factory, marker));
     }
+
+    [Fact]
+    public async Task ContactFormClosed_RejectsSubmission()
+    {
+        var marker = "closed-" + TestData.Token();
+        var client = _factory.CreateBrowserClient();
+
+        // Obtain an antiforgery token while form is open
+        var token = await PortfolioAppFactory.GetAntiforgeryTokenAsync(client, "/contact");
+
+        await _factory.WithDbAsync(async db =>
+        {
+            var settings = await db.SiteSettings.FirstAsync();
+            settings.ShowContactForm = false;
+            await db.SaveChangesAsync();
+        });
+        _factory.GetService<Portfolio.Web.Services.ISiteSettingsService>().InvalidateCache();
+
+        try
+        {
+            // Verify GET /contact hides form and shows closed message
+            var getHtml = await client.GetStringAsync("/contact");
+            Assert.Contains("contact form is currently closed", getHtml, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("<form", getHtml);
+
+            // Verify direct POST submission is rejected
+            var response = await client.PostAsync("/contact", new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["Name"] = "Any Visitor",
+                ["Email"] = "visitor@example.test",
+                ["Subject"] = marker,
+                ["Message"] = "Message to closed form",
+                ["Consent"] = "true",
+                ["__RequestVerificationToken"] = token
+            }));
+
+            var html = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("contact form is currently closed", html, StringComparison.OrdinalIgnoreCase);
+            Assert.Equal(0, await TestData.CountContactMessagesAsync(_factory, marker));
+        }
+        finally
+        {
+            await _factory.WithDbAsync(async db =>
+            {
+                var settings = await db.SiteSettings.FirstAsync();
+                settings.ShowContactForm = true;
+                await db.SaveChangesAsync();
+            });
+            _factory.GetService<Portfolio.Web.Services.ISiteSettingsService>().InvalidateCache();
+        }
+    }
 }

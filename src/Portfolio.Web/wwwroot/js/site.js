@@ -114,4 +114,65 @@
             button.removeAttribute("aria-busy");
         });
     });
+    // Citation modal interactions (CSP-compliant, no inline scripts or onclick)
+    var citationModal = document.getElementById("citation-modal");
+    if (citationModal) {
+        document.querySelectorAll("[data-open-citation]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                if (typeof citationModal.showModal === "function") {
+                    citationModal.showModal();
+                }
+            });
+        });
+
+        document.querySelectorAll("[data-close-citation]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                if (typeof citationModal.close === "function") {
+                    citationModal.close();
+                }
+            });
+        });
+
+        var bibPanel = document.getElementById("panel-bibtex");
+        var apaPanel = document.getElementById("panel-apa");
+        var bibTab = document.getElementById("btn-tab-bibtex");
+        var apaTab = document.getElementById("btn-tab-apa");
+
+        document.querySelectorAll("[data-citation-tab]").forEach(function (tab) {
+            tab.addEventListener("click", function () {
+                var type = tab.getAttribute("data-citation-tab");
+                if (type === "bibtex") {
+                    if (bibPanel) bibPanel.style.display = "block";
+                    if (apaPanel) apaPanel.style.display = "none";
+                    if (bibTab) bibTab.classList.add("is-active");
+                    if (apaTab) apaTab.classList.remove("is-active");
+                } else {
+                    if (bibPanel) bibPanel.style.display = "none";
+                    if (apaPanel) apaPanel.style.display = "block";
+                    if (apaTab) apaTab.classList.add("is-active");
+                    if (bibTab) bibTab.classList.remove("is-active");
+                }
+            });
+        });
+
+        var copyBtn = document.getElementById("btn-copy-citation");
+        if (copyBtn) {
+            copyBtn.addEventListener("click", function () {
+                var codeEl = (apaPanel && apaPanel.style.display !== "none")
+                    ? document.getElementById("code-apa")
+                    : document.getElementById("code-bibtex");
+                if (!codeEl) return;
+                var text = codeEl.textContent || codeEl.innerText;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(function () {
+                        var label = document.getElementById("copy-citation-text");
+                        if (!label) return;
+                        var original = label.textContent;
+                        label.textContent = copyBtn.getAttribute("data-copied-label") || "Copied!";
+                        setTimeout(function () { label.textContent = original; }, 2000);
+                    });
+                }
+            });
+        }
+    }
 })();

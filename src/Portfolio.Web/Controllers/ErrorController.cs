@@ -33,6 +33,7 @@ public class ErrorController : Controller
         if (statusCode >= 500)
             _logger.LogError("Unhandled server error. TraceId: {TraceId}", Activity.Current?.Id ?? HttpContext.TraceIdentifier);
 
+        ViewData["Seo"] = new SeoModel($"{statusCode} - {title}", message, NoIndex: true);
         Response.StatusCode = statusCode;
         return View("Error", new ErrorViewModel { StatusCode = statusCode, Title = title, Message = message });
     }

@@ -216,5 +216,18 @@ public class PublicWebsiteTests
 
         Assert.Contains("citation-modal", html);
         Assert.Contains("@article{", html);
+        Assert.Contains("data-open-citation", html);
+    }
+
+    [Fact]
+    public async Task NotFoundPage_RendersErrorViewWithNoIndex()
+    {
+        var client = _factory.CreateBrowserClient();
+        var response = await client.GetAsync("/non-existent-page-url");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.Contains("404 - Page not found", html);
+        Assert.Contains("noindex, nofollow", html);
     }
 }

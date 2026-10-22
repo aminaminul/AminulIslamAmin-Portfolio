@@ -71,7 +71,7 @@
                             <span>@L["Download PDF"]</span>
                         </a>
                     }
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('citation-modal').showModal()">
+                    <button type="button" class="btn btn-secondary btn-sm" data-open-citation>
                         <partial name="_Icon" model="@("quote")" />
                         <span>@L["Cite"]</span>
                     </button>
@@ -202,11 +202,11 @@
             <div class="citation-dialog-inner">
                 <div class="citation-dialog-header">
                     <h2 id="cite-modal-title">@L["Cite this research"]</h2>
-                    <button type="button" class="citation-close-btn" onclick="document.getElementById('citation-modal').close()" aria-label="@L["Close"]">×</button>
+                    <button type="button" class="citation-close-btn" data-close-citation aria-label="@L["Close"]">×</button>
                 </div>
                 <div class="citation-tabs">
-                    <button type="button" class="citation-tab is-active" id="btn-tab-bibtex" onclick="switchCitation('bibtex')">BibTeX</button>
-                    <button type="button" class="citation-tab" id="btn-tab-apa" onclick="switchCitation('apa')">APA</button>
+                    <button type="button" class="citation-tab is-active" id="btn-tab-bibtex" data-citation-tab="bibtex">BibTeX</button>
+                    <button type="button" class="citation-tab" id="btn-tab-apa" data-citation-tab="apa">APA</button>
                 </div>
                 <div class="citation-body">
                     <div id="panel-bibtex">
@@ -217,46 +217,15 @@
                     </div>
                 </div>
                 <div class="citation-dialog-footer">
-                    <button type="button" class="btn btn-primary btn-sm" id="btn-copy-citation" onclick="copyCitation()">
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-copy-citation" data-copied-label="@L["Copied!"].Value">
                         <partial name="_Icon" model="@("copy")" />
                         <span id="copy-citation-text">@L["Copy citation"]</span>
                     </button>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('citation-modal').close()">
+                    <button type="button" class="btn btn-secondary btn-sm" data-close-citation>
                         @L["Close"]
                     </button>
                 </div>
             </div>
         </dialog>
-        <script>
-            function switchCitation(type) {
-                var bibPanel = document.getElementById('panel-bibtex');
-                var apaPanel = document.getElementById('panel-apa');
-                var bibTab = document.getElementById('btn-tab-bibtex');
-                var apaTab = document.getElementById('btn-tab-apa');
-                if (type === 'bibtex') {
-                    bibPanel.style.display = 'block';
-                    apaPanel.style.display = 'none';
-                    bibTab.classList.add('is-active');
-                    apaTab.classList.remove('is-active');
-                } else {
-                    bibPanel.style.display = 'none';
-                    apaPanel.style.display = 'block';
-                    apaTab.classList.add('is-active');
-                    bibTab.classList.remove('is-active');
-                }
-            }
-            function copyCitation() {
-                var bibPanel = document.getElementById('panel-bibtex');
-                var text = bibPanel.style.display === 'none'
-                    ? document.getElementById('code-apa').innerText
-                    : document.getElementById('code-bibtex').innerText;
-                navigator.clipboard.writeText(text).then(function() {
-                    var label = document.getElementById('copy-citation-text');
-                    var original = label.innerText;
-                    label.innerText = '@L["Copied!"]';
-                    setTimeout(function() { label.innerText = original; }, 2000);
-                });
-            }
-        </script>
     </div>
 </article>
