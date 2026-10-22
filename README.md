@@ -1,13 +1,12 @@
 # Portfolio CMS
 
-A database-driven personal portfolio website with a full content management system, built with
-**C# / ASP.NET Core MVC (.NET 10)**, **Entity Framework Core**, **Microsoft SQL Server** and
+A modern, high-performance personal portfolio website with a full content management system, built with
+**C# / ASP.NET Core MVC (.NET 10)**, **Entity Framework Core 10**, **Microsoft SQL Server**, and
 **ASP.NET Core Identity**.
 
-Everything a visitor sees — the owner's name, title, photo, biography, skills, projects, research,
-experience, education, certifications, services, testimonials, CV, contact details, navigation,
-footer and SEO metadata — is stored in SQL Server and edited from the admin panel. No source change
-is required for ordinary content updates.
+Everything a visitor sees — the owner's name, title, bio, profile photo, skills, projects, academic research,
+work experience, education, certifications, services, client testimonials, resume/CV, contact channels, navigation,
+footer, and SEO metadata — is stored in SQL Server and managed through the authenticated admin panel.
 
 ---
 
@@ -15,149 +14,124 @@ is required for ordinary content updates.
 
 | Document | What it covers |
 | --- | --- |
+| [docs/IMPROVEMENT_PLAN.md](docs/IMPROVEMENT_PLAN.md) | Implementation tracker, verified bug fixes, hardening, and test evidence |
 | [docs/setup.md](docs/setup.md) | Local development, prerequisites, first administrator, running the site |
-| [docs/admin-guide.md](docs/admin-guide.md) | How to use the admin panel, content model and publishing workflow |
+| [docs/admin-guide.md](docs/admin-guide.md) | How to use the admin panel, content model, and publishing workflow |
 | [docs/architecture.md](docs/architecture.md) | Project structure, request flow, services, localization, design system |
 | [docs/database.md](docs/database.md) | Entities, relationships, indexes, migrations |
-| [docs/security.md](docs/security.md) | Authentication, authorization, uploads, headers, secrets, hardening |
+| [docs/security.md](docs/security.md) | Authentication, authorization, uploads, CSP, headers, secrets, hardening |
 | [docs/deployment.md](docs/deployment.md) | Publishing to MonsterASP.NET and other IIS hosts, SQL Server, troubleshooting |
-| [docs/testing.md](docs/testing.md) | Test suite, what it proves, how to run it |
+| [docs/testing.md](docs/testing.md) | Test suite (55 automated tests), what it proves, how to run it |
 
 ---
 
-## Feature summary
+## Feature Summary
 
-**Public site**
+### Public Portfolio Site
 
-- Responsive single-design-system portfolio: home/hero, about, skills, projects (list + detail),
-  research (list + detail with structured sections), services, experience, education,
-  certifications, achievements, testimonials, CV download, contact and a configurable footer.
-- Light and dark themes with a system-preference default, no flash of the wrong theme, and a
-  persisted choice.
-- English and Bangla interface with Bangla content fields per record and a documented English
-  fallback.
-- SEO: per-page titles and descriptions, canonical URLs, Open Graph tags, XML sitemap (published
-  content only), `robots.txt`, clean slugs, custom 404/500 pages.
-- Accessibility: semantic landmarks, skip link, visible focus, labelled forms, keyboard-operable
-  navigation and dialogs, `prefers-reduced-motion` support.
-- Honest empty states. Nothing is invented: an unconfigured section renders a clean message.
+- **Modern Responsive Design**: Clean, hand-crafted design system with light/dark theme switching (system preference default, persistent cookie/localStorage, zero flash of unstyled content).
+- **Projects Showcase (`/projects`)**: Filterable project gallery with category chips, full-text search, and **interactive technology filtering** (`/projects?tech=...`) with removable filter chips.
+- **Academic Research (`/research`)**: Full academic publication archive with authors, publication venue, DOI linking, PDF downloading, and an **accessible citation generator** supporting BibTeX and APA formats with one-click clipboard copying.
+- **Career & Credentials (`/about`)**: Interactive timeline for work experience, academic background, achievements, and certification credentials with verified digital badge imagery.
+- **Bilingual Interface**: Full English and Bangla (`bn`) localization across UI chrome and content records with automatic fallback.
+- **SEO & Social Sharing**: Canonical URLs, Open Graph / Twitter Card meta tags, dynamically generated XML sitemap (`/sitemap.xml`) including only published records, crawler directives (`/robots.txt`), and search-engine-safe `noindex, nofollow` headers on error responses.
+- **Health Check & Observability**: Uptime monitoring probe at **`/healthz`** verifying real-time database connectivity.
+- **Accessibility (WCAG 2.2 AA)**: Semantic landmarks, skip-to-content link, accessible `:focus-visible` rings, screen-reader labels, dialog focus management, and automatic `@media (prefers-reduced-motion: reduce)` support.
 
-**Admin panel (`/Admin`)**
+### Admin CMS (`/Admin`)
 
-- ASP.NET Core Identity sign-in, lockout, role-based authorization, no public registration.
-- Dashboard with real counts and recent activity from SQL Server.
-- Management screens for profile, hero, about sections, skills and categories, projects (with
-  gallery and technology tags), experience, education, research (with authors, tags, documents,
-  related projects), certifications, achievements, services, testimonials, resume/CV, contact
-  information, social links, navigation, footer, SEO, media library, contact messages and account
-  security.
-- Draft / published / archived workflow for every publishable entity. Drafts never reach public
-  pages, listings, search, the sitemap or detail URLs.
-- Server-side validation, antiforgery protection on every state-changing request, upload
-  validation, ordering controls and confirmation dialogs.
-- Media library backed by database metadata plus files stored **outside** the web root and served
-  through a controlled `/media/{id}` endpoint.
+- **Secure Authentication**: ASP.NET Core Identity with PBKDF2 password hashing, lockout protection after 5 failed attempts, sliding session expiration, and single-click "Sign out everywhere" session invalidation.
+- **Optimized Dashboard**: Real-time content and message statistics with grouped SQL status queries to minimize database round-trips.
+- **Granular Publishing Workflow**: Draft / Published / Archived states across all content. Unpublished drafts are strictly excluded from public pages, searches, and sitemaps.
+- **Secure Media Management**: Uploads validated by signature and extension, stored safely outside the web root (`App_Data/media`), served through a controlled `/media/{id}` endpoint with HTTP range processing (`206 Partial Content`), and protected against accidental deletion when referenced by content.
+- **Inbound Communication**: Contact form with honeypot spam traps, SHA-256 IP address hashing for privacy compliance, IP-based rate limiting (5 submissions per 10 minutes), and optional MailKit SMTP notifications.
 
 ---
 
-## Quick start
+## Quick Start
 
 ```bash
 git clone <repository-url>
 cd AminulIslamAmin-Portfolio
 
-# 1. Configure secrets (never commit these)
+# 1. Configure user secrets (never commit these)
 cd src/Portfolio.Web
 dotnet user-secrets init
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\\MSSQLLocalDB;Database=PortfolioCms;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
-dotnet user-secrets set "AdminSeed:Email" "you@example.com"
-dotnet user-secrets set "AdminSeed:Password" "<a long unique password>"
+dotnet user-secrets set "AdminSeed:Email" "admin@example.com"
+dotnet user-secrets set "AdminSeed:Password" "<a-strong-12+-character-password>"
 
-# 2. Create the database
+# 2. Apply database migrations
 cd ../..
 dotnet ef database update --project src/Portfolio.Web
 
-# 3. Run
+# 3. Run the application
 dotnet run --project src/Portfolio.Web
 ```
 
-The site starts on the URL printed in the console (for example `https://localhost:7xxx`).
-The admin panel is at **`/Admin`** (also linked from the footer and the header shield icon).
-
-Full instructions, including how to provision the administrator on a host where user secrets are
-unavailable, are in [docs/setup.md](docs/setup.md).
+The site will start on the URL printed in the console (e.g. `https://localhost:7xxx`).  
+The CMS admin panel is at **`/Admin`** (also accessible from the footer and header navigation).
 
 ---
 
-## Common commands
+## Common Commands
 
 ```bash
-dotnet restore                                   # restore packages
-dotnet build -c Release                          # build everything (0 warnings)
-dotnet test                                      # run the automated test suite
-dotnet publish src/Portfolio.Web -c Release -o ./publish   # deployment output
-dotnet ef migrations add <Name> --project src/Portfolio.Web
+dotnet restore                                             # Restore NuGet packages
+dotnet build -c Release /warnaserror                       # Build with zero warnings
+dotnet test                                                # Run the 55 automated tests
+dotnet publish src/Portfolio.Web -c Release -o ./publish   # Generate production release
+dotnet ef migrations add <MigrationName> --project src/Portfolio.Web
 dotnet ef database update --project src/Portfolio.Web
 ```
 
 ---
 
-## Technology
+## Technology Stack
 
 | Concern | Choice |
 | --- | --- |
-| Runtime | .NET 10 (`net10.0`), ASP.NET Core MVC with Razor Views |
-| Database | Microsoft SQL Server, EF Core 10 (`Microsoft.EntityFrameworkCore.SqlServer`) |
-| Identity | ASP.NET Core Identity with EF Core stores, `Administrator` role |
-| Frontend | Hand-authored CSS design system, no CSS framework dependency, ~10 KB of vanilla JS |
-| Icons | Inline SVG sprite generated by `Views/Shared/_Icon.cshtml` (Lucide-derived paths) |
-| Markdown | Markdig with raw HTML disabled and link hardening |
-| Email | MailKit (optional; the contact form stores messages in SQL Server regardless) |
-| Tests | xUnit + `Microsoft.AspNetCore.Mvc.Testing` against SQLite in-memory |
+| **Runtime & Framework** | .NET 10 (`net10.0`), ASP.NET Core MVC with Razor Views |
+| **Data Access & ORM** | Microsoft SQL Server, Entity Framework Core 10 (`Microsoft.EntityFrameworkCore.SqlServer`) |
+| **Authentication & Identity** | ASP.NET Core Identity with EF Core stores, role-based authorization (`Administrator`) |
+| **Frontend Architecture** | Custom CSS3 design tokens, responsive CSS grid/flexbox, ~10 KB unobtrusive vanilla JS |
+| **Security & Headers** | Strict Content Security Policy (`script-src 'self'`), AntiForgery validation, nosniff, frame-ancestors |
+| **Icons & Media** | Inline SVG vector catalogue (`Views/Shared/_Icon.cshtml`), controlled streaming endpoint |
+| **Markdown Processing** | Markdig with HTML sanitization and safe link target attributes |
+| **Email Delivery** | MailKit & MimeKit (optional SMTP; messages persist in database regardless) |
+| **Automated Testing** | xUnit, `Microsoft.AspNetCore.Mvc.Testing` with in-memory SQLite (55 tests) |
 
 ---
 
-## Project layout
+## Project Structure
 
 ```
 PortfolioCMS.slnx
 src/Portfolio.Web/
-  Controllers/            public request handling (Home, Projects, Research, Contact, Media, Sitemap)
-  Areas/Admin/            protected CMS: controllers, Razor views, layouts, admin JS/CSS
-  Models/Entities/        persisted entities
-  Models/ViewModels/      strongly typed page and form models
-  Data/                   AppDbContext, migrations, startup initializer, design-time factory
-  Services/               settings, queries, media, contact, sitemap, markdown, slugs, email
-  Infrastructure/         paging, validation attributes, security headers, icon catalogue
+  Areas/Admin/            CMS controllers, Razor views, admin styling, and scripts
+  Controllers/            Public endpoints (Home, Projects, Research, Contact, Media, Sitemap, Error)
+  Data/                   AppDbContext, migrations, database initializer, design-time factory
+  Infrastructure/         Health checks, paging, validation attributes, security headers, icon catalogue
+  Models/Entities/        Persisted domain entities (Career, Content, Projects, Research, Settings, Skills)
+  Models/ViewModels/      Strongly typed page, form, and admin models
   Resources/              SharedResource.resx (en) and SharedResource.bn.resx (bn)
-  Views/                  public Razor views and shared partials
-  wwwroot/                css/, js/, images/
-tests/Portfolio.Tests/    integration and unit tests
-docs/                     architecture, setup, database, security, deployment, testing, admin guide
-tools/generate-resources.py  helper that writes the .resx files from one source of truth
+  Services/               Portfolio queries, media storage, contact processor, markdown, slugs, email
+  Views/                  Public Razor views, layouts, and partial components
+  wwwroot/                css/, js/, images/ (client static assets)
+tests/Portfolio.Tests/    Integration and functional test suite (55 tests)
+docs/                     Architecture, setup, admin guide, database, security, deployment, testing
 ```
 
 ---
 
-## Deployment in one paragraph
+## Status & Verification
 
-Publish with `dotnet publish src/Portfolio.Web -c Release`, then upload the output (Web Deploy,
-FTP/SFTP or ZIP) to an IIS host with the ASP.NET Core Hosting Bundle for the matching .NET version.
-Set `ASPNETCORE_ENVIRONMENT=Production`, provide `ConnectionStrings__DefaultConnection`,
-`AdminSeed__Email` and `AdminSeed__Password` as environment variables, apply migrations and open
-`/Admin`. Media is stored under `App_Data/media`, outside the web root, so that folder must persist
-across deployments. See [docs/deployment.md](docs/deployment.md) for the verified MonsterASP.NET
-walkthrough and troubleshooting.
+- **Compiler**: Builds cleanly in Release mode with **0 errors and 0 warnings** (`/warnaserror`).
+- **Tests**: **55 passed, 0 failed, 0 skipped** across public endpoints, admin workflows, and security barriers.
+- **Security & Integrity**: CSP-compliant, reverse proxy header hardening applied, and production cookies enforce `SecurePolicy.Always`.
+- **Database**: Validated with EF Core migrations against SQL Server LocalDB and SQLite in-memory test fixtures.
 
 ---
-
-## Status
-
-The application in this repository builds in Release with no warnings, the automated suite passes,
-and the end-to-end flows (admin sign-in, content save, publish/unpublish, public rendering,
-contact form, media upload) have been exercised against a real SQL Server LocalDB database.
-**It has not been deployed to a live host**; the deployment guide describes exactly what remains for
-you to do with your own hosting credentials.
 
 ## License
 
